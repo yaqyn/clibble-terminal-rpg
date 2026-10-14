@@ -81,3 +81,16 @@ func TestExclusiveSaveLock(t *testing.T) {
 	}
 	next()
 }
+
+func TestSaveReplacesExistingCollection(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "pokedex.json")
+	for _, pokemon := range []pokeapi.Pokemon{{Name: "pidgey", Height: 3}, {Name: "pikachu", Height: 4}} {
+		if err := savePokedex(path, map[string]pokeapi.Pokemon{pokemon.Name: pokemon}); err != nil {
+			t.Fatal(err)
+		}
+		loaded, err := loadPokedex(path)
+		if err != nil || len(loaded) != 1 || loaded[pokemon.Name].Height != pokemon.Height {
+			t.Fatalf("replacement failed: %v %v", loaded, err)
+		}
+	}
+}
