@@ -64,9 +64,6 @@ func TestSaveFailurePreservesPreviousFile(t *testing.T) {
 	}
 }
 func TestExclusiveSaveLock(t *testing.T) {
-	if runtime.GOOS != "linux" && runtime.GOOS != "darwin" && runtime.GOOS != "freebsd" {
-		t.Skip("persistent saves unavailable")
-	}
 	path := filepath.Join(t.TempDir(), "save.json")
 	release, err := lockSave(path)
 	if err != nil {

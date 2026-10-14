@@ -75,5 +75,5 @@ func savePokedex(path string, pokemon map[string]pokeapi.Pokemon) error {
 	if err := temp.Close(); err != nil {
 		return err
 	}
-	return os.Rename(temp.Name(), path)
+	return replaceSave(temp.Name(), path)
 }

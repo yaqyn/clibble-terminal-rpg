@@ -25,6 +25,9 @@ type pokemonAPI interface {
 	GetPokemon(context.Context, string) (pokeapi.Pokemon, error)
 }
 type config struct {
+	errOut   io.Writer
+	prompt   bool
+	batch    bool
 	commands map[string]cliCommand
 	client   pokemonAPI
 	ctx      context.Context
@@ -143,8 +146,7 @@ func commandCatch(cfg *config, args ...string) error {
 func commandInspect(cfg *config, args ...string) error {
 	pokemon, ok := cfg.pokedex[args[0]]
 	if !ok {
-		fmt.Fprintln(cfg.out, "you have not caught that pokemon")
-		return nil
+		return fmt.Errorf("you have not caught that pokemon")
 	}
 	fmt.Fprintf(cfg.out, "Name: %s\nHeight: %d\nWeight: %d\nStats:\n", pokemon.Name, pokemon.Height, pokemon.Weight)
 	for _, stat := range pokemon.Stats {
