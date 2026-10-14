@@ -1,0 +1,13 @@
+{
+  "name": "Dexrove",
+  "slug": "dexrove",
+  "tagline": "Explore. Catch. Keep.",
+  "colors": {
+    "cobalt": "#315dcd",
+    "ink": "#192b46",
+    "mist": "#edf2f9",
+    "cloud": "#ffffff",
+    "slate": "#53637a",
+    "azure": "#88baff"
+  }
+}
