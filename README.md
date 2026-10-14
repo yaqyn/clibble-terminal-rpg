@@ -7,7 +7,7 @@ Pokedex uses PokéAPI for world data and saves caught Pokemon automatically,
 so your collection is available when you return. Use the interactive prompt
 or run individual commands from your shell.
 
-[Run the CLI](#-quick-start). New API data requires an internet connection. No account,
+[Download v1.0.0](https://github.com/yaqyn/pokedex/releases/tag/v1.0.0) or [run from source](#-quick-start). New API data requires an internet connection. No account,
 API key, or runtime dependencies are needed for a compiled binary.
 
 ## <img src="readme-assets/icons/features.svg" width="24" height="24" alt=""> Features
@@ -21,8 +21,20 @@ API key, or runtime dependencies are needed for a compiled binary.
 
 ## <img src="readme-assets/icons/installation.svg" width="24" height="24" alt=""> Installation
 
+Download the archive for your operating system and architecture from the
+[release page](https://github.com/yaqyn/pokedex/releases/tag/v1.0.0), verify it against
+`SHA256SUMS`, and extract it. Run the included `pokedex` binary (`pokedex.exe` on
+Windows). Release archives include the README and dependency notices.
+
 Source builds require the Go version declared in [go.mod](go.mod) or newer.
-Go downloads the pinned build dependencies on the first build. From the project root:
+Go downloads the pinned build dependencies on the first build:
+
+```bash
+git clone https://github.com/yaqyn/pokedex.git
+cd pokedex
+```
+
+Then build from the project root:
 
 ```bash
 go build -trimpath -o pokedex .
@@ -155,7 +167,7 @@ exclusive writer locks, one-shot commands, automatic save directories, and batch
 [CI](.github/workflows/ci.yml) runs tests, vet, and builds on Linux, macOS, and
 Windows; its Linux security job checks reachable Go vulnerabilities and formatting.
 Local verification also included a live catch/save/restart session against PokéAPI.
-Hosted CI is configured; it has not been run for this local repository.
+Native tests, vet, builds, and the security check have passed in [GitHub Actions](https://github.com/yaqyn/pokedex/actions/workflows/ci.yml).
 
 To create Linux, macOS, and Windows archives for amd64 and arm64:
 
@@ -163,7 +175,7 @@ To create Linux, macOS, and Windows archives for amd64 and arm64:
 python3 scripts/release.py v1.0.0
 ```
 
-Archives and `SHA256SUMS` appear in `dist/v1.0.0/`. This builds local artifacts;
+Archives and `SHA256SUMS` appear in `dist/v1.0.0/`. This builds local artifacts and requires a clean Git tree;
 it does not publish a release. Python 3 is required only for this packaging step.
 
 ## <img src="readme-assets/icons/security.svg" width="24" height="24" alt=""> Security and limitations

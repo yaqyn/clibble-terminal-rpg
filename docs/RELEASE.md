@@ -12,10 +12,9 @@ CGO disabled. Archives include the README, vector artwork, application license,
 and dependency notices. Downloaded binaries have no runtime Go or Python dependency.
 
 The build version comes from the release argument. Packaging does not create a
-Git tag, publish to GitHub, or install binaries system-wide. Native tests run on
-Linux locally; the CI matrix is configured for native Linux, macOS, and Windows
-tests when the repository is published. Cross-compilation is not a substitute for
-those native runtime tests.
+Git tag, publish to GitHub, or install binaries system-wide. Native tests run locally on Linux and in GitHub Actions on Linux, macOS, and
+Windows. Verify the workflow for the exact release commit before publishing;
+cross-compilation is not a substitute for native runtime tests.
 
 For a schema change, retain compatibility with existing `version: 1` collections
 or add an explicit migration. Never silently reset a collection when loading fails.
