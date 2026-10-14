@@ -132,3 +132,41 @@ func TestInvalidConfiguration(t *testing.T) {
 		t.Fatal("zero timeout accepted")
 	}
 }
+
+func TestInvalidIdentifiersDoNotReachNetwork(t *testing.T) {
+	hits := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { hits++; fmt.Fprint(w, `{}`) }))
+	defer server.Close()
+	client, _ := NewClient(server.URL+"/", time.Second)
+	for _, name := range []string{"", "../secret", "pikachu\x1b[31m", "-foo", strings.Repeat("x", 101)} {
+		if _, err := client.Explore(context.Background(), name); err == nil {
+			t.Fatalf("area accepted %q", name)
+		}
+		if _, err := client.GetPokemon(context.Background(), name); err == nil {
+			t.Fatalf("Pokemon accepted %q", name)
+		}
+	}
+	if hits != 0 {
+		t.Fatal("invalid identifier reached network")
+	}
+}
+func TestSemanticallyInvalidResponsesNotCached(t *testing.T) {
+	var hits atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits.Add(1)
+		fmt.Fprint(w, `{"name":"pidgey","types":[{"type":{"name":"\u001b[31m"}}]}`)
+	}))
+	defer server.Close()
+	client, _ := NewClient(server.URL+"/", time.Second)
+	cache := pokecache.NewCache(time.Hour)
+	defer cache.Close()
+	client.SetCache(cache)
+	for i := 0; i < 2; i++ {
+		if _, err := client.GetPokemon(context.Background(), "pidgey"); err == nil {
+			t.Fatal("terminal control accepted")
+		}
+	}
+	if hits.Load() != 2 {
+		t.Fatal("invalid response cached")
+	}
+}

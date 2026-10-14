@@ -86,7 +86,10 @@ func (c *Client) get(ctx context.Context, path string, dest any) error {
 	key := target.String()
 	if c.cache != nil {
 		if data, ok := c.cache.Get(key); ok {
-			return json.Unmarshal(data, dest)
+			if err := json.Unmarshal(data, dest); err != nil {
+				return err
+			}
+			return validateResponse(dest)
 		}
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, key, nil)
@@ -113,6 +116,9 @@ func (c *Client) get(ctx context.Context, path string, dest any) error {
 	if err := json.Unmarshal(data, dest); err != nil {
 		return fmt.Errorf("decode PokéAPI: %w", err)
 	}
+	if err := validateResponse(dest); err != nil {
+		return err
+	}
 	if c.cache != nil {
 		c.cache.Add(key, data)
 	}
@@ -126,14 +132,6 @@ func (c *Client) ListLocations(ctx context.Context, page *string) (Locations, er
 	}
 	var result Locations
 	err := c.get(ctx, path, &result)
-	if err == nil {
-		for _, area := range result.Results {
-			if !ValidName(area.Name) {
-				err = fmt.Errorf("invalid area name in API response")
-				break
-			}
-		}
-	}
 	return result, err
 }
 func (c *Client) Explore(ctx context.Context, name string) (Area, error) {
@@ -142,14 +140,6 @@ func (c *Client) Explore(ctx context.Context, name string) (Area, error) {
 		return result, fmt.Errorf("invalid area name")
 	}
 	err := c.get(ctx, "location-area/"+url.PathEscape(name)+"/", &result)
-	if err == nil {
-		for _, encounter := range result.PokemonEncounters {
-			if !ValidName(encounter.Pokemon.Name) {
-				err = fmt.Errorf("invalid Pokemon name in API response")
-				break
-			}
-		}
-	}
 	return result, err
 }
 func (c *Client) GetPokemon(ctx context.Context, name string) (Pokemon, error) {
@@ -158,9 +148,6 @@ func (c *Client) GetPokemon(ctx context.Context, name string) (Pokemon, error) {
 		return result, fmt.Errorf("invalid Pokemon name")
 	}
 	err := c.get(ctx, "pokemon/"+url.PathEscape(name)+"/", &result)
-	if err == nil {
-		err = ValidatePokemon(result)
-	}
 	return result, err
 }
 
@@ -190,6 +177,26 @@ func ValidatePokemon(p Pokemon) error {
 	for _, t := range p.Types {
 		if !ValidName(t.Type.Name) {
 			return fmt.Errorf("invalid Pokemon type")
+		}
+	}
+	return nil
+}
+
+func validateResponse(dest any) error {
+	switch value := dest.(type) {
+	case *Pokemon:
+		return ValidatePokemon(*value)
+	case *Locations:
+		for _, area := range value.Results {
+			if !ValidName(area.Name) {
+				return fmt.Errorf("invalid area name in API response")
+			}
+		}
+	case *Area:
+		for _, encounter := range value.PokemonEncounters {
+			if !ValidName(encounter.Pokemon.Name) {
+				return fmt.Errorf("invalid Pokemon name in API response")
+			}
 		}
 	}
 	return nil

@@ -56,7 +56,7 @@ func savePokedex(path string, pokemon map[string]pokeapi.Pokemon) error {
 	if err != nil {
 		return err
 	}
-	if len(data) > maxSaveBytes {
+	if len(data)+1 > maxSaveBytes {
 		return fmt.Errorf("save exceeds 4 MiB")
 	}
 	dir := filepath.Dir(path)

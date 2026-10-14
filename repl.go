@@ -27,6 +27,9 @@ func runREPL(cfg *config, in io.Reader) error {
 			return err
 		}
 		if !scanner.Scan() {
+			if err := cfg.ctx.Err(); err != nil {
+				return err
+			}
 			return scanner.Err()
 		}
 		words := cleanInput(scanner.Text())
