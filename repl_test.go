@@ -146,3 +146,17 @@ func TestREPLEOFAndInputLimit(t *testing.T) {
 		t.Fatalf("got %v", err)
 	}
 }
+
+func TestCatchAliasPreservesExistingPokemon(t *testing.T) {
+	cfg, out, _ := testConfig()
+	original := pokeapi.Pokemon{Name: "pidgey", Height: 99}
+	cfg.pokedex["pidgey"] = original
+	cfg.save = func(map[string]pokeapi.Pokemon) error { t.Fatal("duplicate should not save"); return nil }
+	cfg.random = func() float64 { t.Fatal("duplicate should not roll again"); return 0 }
+	if err := commandCatch(cfg, "16"); err != nil {
+		t.Fatal(err)
+	}
+	if cfg.pokedex["pidgey"].Height != 99 || !strings.Contains(out.String(), "already in your Pokedex") {
+		t.Fatal("alias replaced existing catch")
+	}
+}

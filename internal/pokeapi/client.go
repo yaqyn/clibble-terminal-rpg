@@ -75,6 +75,9 @@ func (c *Client) get(ctx context.Context, path string, dest any) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+	if len(path) > 4096 {
+		return fmt.Errorf("API URL exceeds 4096 bytes")
+	}
 	ref, err := url.Parse(path)
 	if err != nil {
 		return fmt.Errorf("invalid API URL: %w", err)

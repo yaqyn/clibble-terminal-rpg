@@ -73,3 +73,13 @@ func TestConcurrentAccessAndClose(t *testing.T) {
 		t.Fatal("worker still running")
 	}
 }
+
+func TestOversizeKeyNotStored(t *testing.T) {
+	c := NewCache(time.Hour)
+	defer c.Close()
+	key := string(make([]byte, maxKeyBytes+1))
+	c.Add(key, []byte("small response"))
+	if _, ok := c.Get(key); ok {
+		t.Fatal("unbounded key stored")
+	}
+}

@@ -8,6 +8,7 @@ import (
 
 const maxEntries = 256
 const maxBytes = 16 << 20
+const maxKeyBytes = 4096
 
 type cacheEntry struct {
 	createdAt time.Time
@@ -36,7 +37,7 @@ func NewCache(interval time.Duration) *Cache {
 
 // Add copies val so callers cannot mutate a cached response.
 func (c *Cache) Add(key string, val []byte) {
-	if len(val) > maxBytes {
+	if len(val) > maxBytes || len(key) > maxKeyBytes {
 		return
 	}
 	c.mu.Lock()

@@ -122,6 +122,10 @@ func commandCatch(cfg *config, args ...string) error {
 	if err != nil {
 		return err
 	}
+	if _, ok := cfg.pokedex[pokemon.Name]; ok {
+		fmt.Fprintf(cfg.out, "%s is already in your Pokedex.\n", pokemon.Name)
+		return nil
+	}
 	if cfg.random() >= catchProbability(pokemon.BaseExperience) {
 		fmt.Fprintf(cfg.out, "%s escaped!\n", pokemon.Name)
 		return nil
