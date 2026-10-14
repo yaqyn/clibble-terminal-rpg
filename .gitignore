@@ -3,3 +3,9 @@
 /coverage.out
 
 /repl.log
+
+/pokedex.json
+/pokedex.json.lock
+/dist/
+
+__pycache__/
