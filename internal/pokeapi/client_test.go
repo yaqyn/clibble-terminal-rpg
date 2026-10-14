@@ -97,7 +97,7 @@ func TestURLBoundaryAndRedirect(t *testing.T) {
 	}))
 	defer server.Close()
 	client, _ := NewClient(server.URL+"/api/v2/", time.Second)
-	for _, page := range []string{"https://example.com/api/v2/", server.URL + "/private/", server.URL + "/api/v2/../private/"} {
+	for _, page := range []string{"https://example.com/api/v2/", server.URL + "/private/", server.URL + "/api/v2/../private/", server.URL + "/api/v2/%2e%2e/private/", server.URL + "/api/v2/foo%2f..%2f..%2fprivate/"} {
 		if _, err := client.ListLocations(context.Background(), &page); err == nil {
 			t.Fatalf("accepted %s", page)
 		}

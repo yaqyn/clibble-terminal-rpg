@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	pathpkg "path"
 	"strings"
 	"time"
 )
@@ -83,7 +84,7 @@ func (c *Client) get(ctx context.Context, path string, dest any) error {
 		return fmt.Errorf("invalid API URL: %w", err)
 	}
 	target := c.base.ResolveReference(ref)
-	if target.Scheme != c.base.Scheme || target.Host != c.base.Host || target.User != nil || target.Fragment != "" || !strings.HasPrefix(target.Path, c.base.Path) {
+	if target.Scheme != c.base.Scheme || target.Host != c.base.Host || target.User != nil || target.Fragment != "" || !strings.HasPrefix(pathpkg.Clean(target.Path)+"/", c.base.Path) {
 		return fmt.Errorf("API URL outside configured origin or path")
 	}
 	key := target.String()
