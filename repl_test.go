@@ -5,9 +5,11 @@ import (
 	"context"
 	"errors"
 	"github.com/yaqyn/pokedex/internal/pokeapi"
+	"io"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -158,5 +160,26 @@ func TestCatchAliasPreservesExistingPokemon(t *testing.T) {
 	}
 	if cfg.pokedex["pidgey"].Height != 99 || !strings.Contains(out.String(), "already in your Pokedex") {
 		t.Fatal("alias replaced existing catch")
+	}
+}
+
+func TestREPLCancellationWhileInputIsBlocked(t *testing.T) {
+	cfg, _, _ := testConfig()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	cfg.ctx = ctx
+	input, writer := io.Pipe()
+	defer input.Close()
+	defer writer.Close()
+	result := make(chan error, 1)
+	go func() { result <- runREPL(cfg, input) }()
+	cancel()
+	select {
+	case err := <-result:
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("got %v", err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("cancellation waited for input")
 	}
 }

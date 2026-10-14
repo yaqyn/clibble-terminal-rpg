@@ -39,6 +39,29 @@ func execute(cfg *config, words []string) error {
 func runREPL(cfg *config, in io.Reader) error {
 	scanner := bufio.NewScanner(in)
 	scanner.Buffer(make([]byte, 4096), 64*1024)
+	// Terminal reads can remain blocked after Close. Keep input scanning separate
+	// so cancellation does not wait for the next newline.
+	type inputLine struct {
+		text string
+		err  error
+		done bool
+	}
+	lines := make(chan inputLine)
+	stopScan := make(chan struct{})
+	defer close(stopScan)
+	go func() {
+		for scanner.Scan() {
+			select {
+			case lines <- inputLine{text: scanner.Text()}:
+			case <-stopScan:
+				return
+			}
+		}
+		select {
+		case lines <- inputLine{done: true, err: scanner.Err()}:
+		case <-stopScan:
+		}
+	}()
 	failed := false
 	finish := func(err error) error {
 		if err != nil {
@@ -62,13 +85,16 @@ func runREPL(cfg *config, in io.Reader) error {
 				return err
 			}
 		}
-		if !scanner.Scan() {
-			if err := cfg.ctx.Err(); err != nil {
-				return err
-			}
-			return finish(scanner.Err())
+		var line inputLine
+		select {
+		case <-cfg.ctx.Done():
+			return cfg.ctx.Err()
+		case line = <-lines:
 		}
-		words := cleanInput(scanner.Text())
+		if line.done {
+			return finish(line.err)
+		}
+		words := cleanInput(line.text)
 		if len(words) == 0 {
 			continue
 		}

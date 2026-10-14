@@ -30,15 +30,6 @@ func main() {
 func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	done := make(chan struct{})
-	defer close(done)
-	go func() {
-		select {
-		case <-ctx.Done():
-			_ = os.Stdin.Close()
-		case <-done:
-		}
-	}()
 	interactive := term.IsTerminal(int(os.Stdin.Fd()))
 	return runCLI(ctx, os.Args[1:], os.Stdin, os.Stdout, os.Stderr, interactive)
 }
