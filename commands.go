@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"sort"
-	"strings"
 
 	"github.com/yaqyn/pokedex/internal/pokeapi"
 )
@@ -163,14 +162,4 @@ func commandPokedex(cfg *config, args ...string) error {
 	}
 	return nil
 }
-func validName(name string) bool {
-	if len(name) == 0 || len(name) > 100 {
-		return false
-	}
-	for _, r := range name {
-		if !(r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '-') {
-			return false
-		}
-	}
-	return !strings.HasPrefix(name, "-")
-}
+func validName(name string) bool { return pokeapi.ValidName(name) }

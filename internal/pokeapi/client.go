@@ -72,6 +72,9 @@ func NewClient(baseURL string, timeout time.Duration) (*Client, error) {
 func (c *Client) SetCache(store cache) { c.cache = store }
 
 func (c *Client) get(ctx context.Context, path string, dest any) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	ref, err := url.Parse(path)
 	if err != nil {
 		return fmt.Errorf("invalid API URL: %w", err)
@@ -123,18 +126,71 @@ func (c *Client) ListLocations(ctx context.Context, page *string) (Locations, er
 	}
 	var result Locations
 	err := c.get(ctx, path, &result)
+	if err == nil {
+		for _, area := range result.Results {
+			if !ValidName(area.Name) {
+				err = fmt.Errorf("invalid area name in API response")
+				break
+			}
+		}
+	}
 	return result, err
 }
 func (c *Client) Explore(ctx context.Context, name string) (Area, error) {
 	var result Area
+	if !ValidName(name) {
+		return result, fmt.Errorf("invalid area name")
+	}
 	err := c.get(ctx, "location-area/"+url.PathEscape(name)+"/", &result)
+	if err == nil {
+		for _, encounter := range result.PokemonEncounters {
+			if !ValidName(encounter.Pokemon.Name) {
+				err = fmt.Errorf("invalid Pokemon name in API response")
+				break
+			}
+		}
+	}
 	return result, err
 }
 func (c *Client) GetPokemon(ctx context.Context, name string) (Pokemon, error) {
 	var result Pokemon
+	if !ValidName(name) {
+		return result, fmt.Errorf("invalid Pokemon name")
+	}
 	err := c.get(ctx, "pokemon/"+url.PathEscape(name)+"/", &result)
-	if err == nil && result.Name == "" {
-		err = fmt.Errorf("PokéAPI returned a Pokemon without a name")
+	if err == nil {
+		err = ValidatePokemon(result)
 	}
 	return result, err
+}
+
+// ValidName accepts PokéAPI identifiers and rejects paths and terminal controls.
+func ValidName(name string) bool {
+	if len(name) == 0 || len(name) > 100 || strings.HasPrefix(name, "-") {
+		return false
+	}
+	for _, r := range name {
+		if !(r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '-') {
+			return false
+		}
+	}
+	return true
+}
+
+// ValidatePokemon verifies fields used in terminal output and saved collections.
+func ValidatePokemon(p Pokemon) error {
+	if !ValidName(p.Name) || p.Height < 0 || p.Weight < 0 || p.BaseExperience < 0 {
+		return fmt.Errorf("invalid Pokemon fields")
+	}
+	for _, s := range p.Stats {
+		if !ValidName(s.Stat.Name) || s.BaseStat < 0 {
+			return fmt.Errorf("invalid Pokemon stat")
+		}
+	}
+	for _, t := range p.Types {
+		if !ValidName(t.Type.Name) {
+			return fmt.Errorf("invalid Pokemon type")
+		}
+	}
+	return nil
 }
