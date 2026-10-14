@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yaqyn/pokedex/internal/pokecache"
+	"github.com/yaqyn/dexrove/internal/pokecache"
 )
 
 func TestResponsesAreCached(t *testing.T) {

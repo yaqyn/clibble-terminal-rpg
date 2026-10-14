@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yaqyn/pokedex/internal/pokeapi"
+	"github.com/yaqyn/dexrove/internal/pokeapi"
 )
 
 func TestCLIHelpVersionAndInvalidCommandsHaveNoSaveSideEffects(t *testing.T) {
@@ -21,7 +21,7 @@ func TestCLIHelpVersionAndInvalidCommandsHaveNoSaveSideEffects(t *testing.T) {
 		want      string
 	}{
 		{[]string{"-data", path, "help"}, false, "catch <pokemon>"},
-		{[]string{"-data", path, "-version"}, false, "pokedex dev"},
+		{[]string{"-data", path, "-version"}, false, "dexrove dev"},
 		{[]string{"-data", path, "what"}, true, ""},
 		{[]string{"-data", path, "catch"}, true, ""},
 		{[]string{"-data", path, "catch", "../secret"}, true, ""},
@@ -49,7 +49,7 @@ func TestCLIRestoresCollectionForSingleCommand(t *testing.T) {
 	if err := runCLI(context.Background(), []string{"-data", path, "inspect", "PIDGEY"}, strings.NewReader(""), &out, &errOut, false); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), "Name: pidgey") || strings.Contains(out.String(), "Pokedex >") {
+	if !strings.Contains(out.String(), "Name: pidgey") || strings.Contains(out.String(), "dexrove >") {
 		t.Fatal(out.String())
 	}
 	if err := runCLI(context.Background(), []string{"-data", path, "inspect", "pikachu"}, strings.NewReader(""), &out, &errOut, false); err == nil {
@@ -83,7 +83,7 @@ func TestCLIDefaultSaveDirectory(t *testing.T) {
 	if err := runCLI(context.Background(), []string{"pokedex"}, strings.NewReader(""), &out, &errOut, false); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(dir, "pokedex", "pokedex.json.lock")); err != nil {
+	if _, err := os.Stat(filepath.Join(dir, "dexrove", "collection.json.lock")); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -93,10 +93,10 @@ func TestCLIBatchReportsErrorsAndContinues(t *testing.T) {
 	if !errors.Is(err, errCommandsFailed) {
 		t.Fatalf("got %v", err)
 	}
-	if !strings.Contains(errOut.String(), "Unknown command") || !strings.Contains(out.String(), "Your Pokedex:") {
+	if !strings.Contains(errOut.String(), "Unknown command") || !strings.Contains(out.String(), "Your collection:") {
 		t.Fatal("batch did not continue after error")
 	}
-	if strings.Contains(out.String(), "Pokedex >") {
+	if strings.Contains(out.String(), "dexrove >") {
 		t.Fatal("prompt polluted piped output")
 	}
 }

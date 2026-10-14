@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/yaqyn/pokedex/internal/pokeapi"
+	"github.com/yaqyn/dexrove/internal/pokeapi"
 )
 
 const maxSaveBytes = 4 << 20

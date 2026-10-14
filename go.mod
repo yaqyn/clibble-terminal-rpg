@@ -1,4 +1,4 @@
-module github.com/yaqyn/pokedex
+module github.com/yaqyn/dexrove
 
 go 1.27.2
 

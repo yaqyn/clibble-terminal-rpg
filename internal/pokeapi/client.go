@@ -101,7 +101,7 @@ func (c *Client) get(ctx context.Context, path string, dest any) error {
 		return err
 	}
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", "pokedex-cli/1.0")
+	req.Header.Set("User-Agent", "dexrove/1.1")
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return fmt.Errorf("request PokéAPI: %w", err)

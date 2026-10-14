@@ -7,7 +7,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/yaqyn/pokedex/internal/pokeapi"
+	"github.com/yaqyn/dexrove/internal/pokeapi"
 )
 
 var errExit = errors.New("exit requested")
@@ -25,6 +25,7 @@ type pokemonAPI interface {
 	GetPokemon(context.Context, string) (pokeapi.Pokemon, error)
 }
 type config struct {
+	view     *terminalView
 	errOut   io.Writer
 	prompt   bool
 	batch    bool
@@ -42,23 +43,28 @@ type config struct {
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-		"help":    {"help", "Displays a help message", 0, commandHelp},
-		"exit":    {"exit", "Exit the Pokedex", 0, commandExit},
-		"map":     {"map", "Display the next 20 location areas", 0, commandMap},
-		"mapb":    {"mapb", "Display the previous 20 location areas", 0, commandMapBack},
-		"explore": {"explore <area>", "List Pokemon in a location area", 1, commandExplore},
-		"catch":   {"catch <pokemon>", "Attempt to catch a Pokemon", 1, commandCatch},
-		"inspect": {"inspect <pokemon>", "Show a caught Pokemon's details", 1, commandInspect},
-		"pokedex": {"pokedex", "List your caught Pokemon", 0, commandPokedex},
-		"count":   {"count", "Show the number of caught Pokemon", 0, commandCount},
+		"help":       {"help", "Displays a help message", 0, commandHelp},
+		"exit":       {"exit", "Leave Dexrove", 0, commandExit},
+		"map":        {"map", "Display the next 20 location areas", 0, commandMap},
+		"mapb":       {"mapb", "Display the previous 20 location areas", 0, commandMapBack},
+		"explore":    {"explore <area>", "List Pokemon in a location area", 1, commandExplore},
+		"catch":      {"catch <pokemon>", "Attempt to catch a Pokemon", 1, commandCatch},
+		"inspect":    {"inspect <pokemon>", "Show a caught Pokemon's details", 1, commandInspect},
+		"collection": {"collection", "List your caught Pokemon", 0, commandPokedex},
+		"pokedex":    {"pokedex", "Alias for collection", 0, commandPokedex},
+		"count":      {"count", "Show the number of caught Pokemon", 0, commandCount},
 	}
 }
 func commandExit(cfg *config, args ...string) error {
-	fmt.Fprintln(cfg.out, "Closing the Pokedex... Goodbye!")
+	fmt.Fprintln(cfg.out, "Leaving Dexrove. See you on the next trail.")
 	return errExit
 }
 func commandHelp(cfg *config, args ...string) error {
-	fmt.Fprint(cfg.out, "Welcome to the Pokedex!\nUsage:\n\n")
+	if cfg.view != nil {
+		cfg.view.help()
+		return nil
+	}
+	fmt.Fprint(cfg.out, "Dexrove — Explore. Catch. Keep.\nUsage:\n\n")
 	for _, key := range sortedKeys(cfg.commands) {
 		cmd := cfg.commands[key]
 		fmt.Fprintf(cfg.out, "%s: %s\n", cmd.name, cmd.description)
@@ -118,7 +124,7 @@ func catchProbability(experience int) float64 {
 }
 func commandCatch(cfg *config, args ...string) error {
 	if _, ok := cfg.pokedex[args[0]]; ok {
-		fmt.Fprintf(cfg.out, "%s is already in your Pokedex.\n", args[0])
+		fmt.Fprintf(cfg.out, "%s is already in your collection.\n", args[0])
 		return nil
 	}
 	fmt.Fprintf(cfg.out, "Throwing a Pokeball at %s...\n", args[0])
@@ -127,7 +133,7 @@ func commandCatch(cfg *config, args ...string) error {
 		return err
 	}
 	if _, ok := cfg.pokedex[pokemon.Name]; ok {
-		fmt.Fprintf(cfg.out, "%s is already in your Pokedex.\n", pokemon.Name)
+		fmt.Fprintf(cfg.out, "%s is already in your collection.\n", pokemon.Name)
 		return nil
 	}
 	if cfg.random() >= catchProbability(pokemon.BaseExperience) {
@@ -141,13 +147,17 @@ func commandCatch(cfg *config, args ...string) error {
 			return fmt.Errorf("save catch: %w", err)
 		}
 	}
-	fmt.Fprintf(cfg.out, "%s was caught!\nYou may now inspect it with the inspect command.\n", pokemon.Name)
+	fmt.Fprintf(cfg.out, "%s was caught!\nOpen its record with inspect <pokemon>.\n", pokemon.Name)
 	return nil
 }
 func commandInspect(cfg *config, args ...string) error {
 	pokemon, ok := cfg.pokedex[args[0]]
 	if !ok {
-		return fmt.Errorf("you have not caught that pokemon")
+		return fmt.Errorf("you have not caught that pokemon; try catch %s first", args[0])
+	}
+	if cfg.view != nil {
+		cfg.view.inspect(pokemon)
+		return nil
 	}
 	fmt.Fprintf(cfg.out, "Name: %s\nHeight: %d\nWeight: %d\nStats:\n", pokemon.Name, pokemon.Height, pokemon.Weight)
 	for _, stat := range pokemon.Stats {
@@ -160,7 +170,11 @@ func commandInspect(cfg *config, args ...string) error {
 	return nil
 }
 func commandPokedex(cfg *config, args ...string) error {
-	fmt.Fprintln(cfg.out, "Your Pokedex:")
+	if cfg.view != nil {
+		cfg.view.collection(cfg.pokedex)
+		return nil
+	}
+	fmt.Fprintln(cfg.out, "Your collection:")
 	for _, name := range sortedKeys(cfg.pokedex) {
 		fmt.Fprintf(cfg.out, " - %s\n", name)
 	}

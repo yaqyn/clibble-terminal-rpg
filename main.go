@@ -14,8 +14,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/yaqyn/pokedex/internal/pokeapi"
-	"github.com/yaqyn/pokedex/internal/pokecache"
+	"github.com/yaqyn/dexrove/internal/brand"
+	"github.com/yaqyn/dexrove/internal/pokeapi"
+	"github.com/yaqyn/dexrove/internal/pokecache"
 	"golang.org/x/term"
 )
 
@@ -34,14 +35,15 @@ func run() error {
 	return runCLI(ctx, os.Args[1:], os.Stdin, os.Stdout, os.Stderr, interactive)
 }
 func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Writer, interactive bool) error {
-	flags := flag.NewFlagSet("pokedex", flag.ContinueOnError)
+	flags := flag.NewFlagSet(brand.Get().Slug, flag.ContinueOnError)
 	flags.SetOutput(errOut)
+	colorMode := flags.String("color", "auto", "Terminal color: auto, always, or never")
 	showVersion := flags.Bool("version", false, "Print the build version")
-	dataPath := flags.String("data", "", "JSON save path (default: user configuration directory/pokedex/pokedex.json)")
+	dataPath := flags.String("data", "", "JSON save path (default: user configuration directory/dexrove/collection.json)")
 	ephemeral := flags.Bool("ephemeral", false, "Use a temporary collection without loading or writing saves")
 	timeout := flags.Duration("timeout", 10*time.Second, "Maximum duration of each API request")
 	flags.Usage = func() {
-		fmt.Fprintln(errOut, "Usage: pokedex [flags] [command [argument]]\n\nStart an interactive session or run one command. Use 'pokedex help' for commands.\n\nFlags:")
+		fmt.Fprintln(errOut, "Usage: dexrove [flags] [command [argument]]\n\nStart an interactive session or run one command. Use 'dexrove help' for commands.\n\nFlags:")
 		flags.PrintDefaults()
 	}
 	if err := flags.Parse(args); errors.Is(err, flag.ErrHelp) {
@@ -49,8 +51,11 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 	} else if err != nil {
 		return err
 	}
+	if *colorMode != "auto" && *colorMode != "always" && *colorMode != "never" {
+		return fmt.Errorf("-color must be auto, always, or never")
+	}
 	if *showVersion {
-		fmt.Fprintln(out, "pokedex", version)
+		fmt.Fprintln(out, brand.Get().Slug, version)
 		return nil
 	}
 	if *ephemeral && *dataPath != "" {
@@ -61,6 +66,20 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 		words[i] = strings.ToLower(words[i])
 	}
 	cfg := &config{commands: getCommands(), ctx: ctx, out: out, errOut: errOut, prompt: interactive, batch: !interactive, pokedex: make(map[string]pokeapi.Pokemon), random: rand.Float64}
+	if interactive {
+		width := 80
+		color := *colorMode == "always"
+		if file, ok := out.(*os.File); ok {
+			if w, _, err := term.GetSize(int(file.Fd())); err == nil && w > 0 {
+				width = w
+			}
+			if *colorMode == "auto" {
+				_, noColor := os.LookupEnv("NO_COLOR")
+				color = term.IsTerminal(int(file.Fd())) && !noColor && os.Getenv("TERM") != "dumb"
+			}
+		}
+		cfg.view = &terminalView{out: out, color: color, width: width}
+	}
 	// Help and malformed one-shot commands should not create or lock save files.
 	if len(words) > 0 {
 		cmd, ok := cfg.commands[words[0]]
@@ -81,15 +100,7 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 	client.SetCache(cache)
 	cfg.client = client
 	if !*ephemeral {
-		path := *dataPath
-		if path == "" {
-			dir, err := os.UserConfigDir()
-			if err != nil {
-				return fmt.Errorf("find save directory: %w", err)
-			}
-			path = filepath.Join(dir, "pokedex", "pokedex.json")
-		}
-		path, err = filepath.Abs(path)
+		path, err := collectionPath(*dataPath)
 		if err != nil {
 			return err
 		}
@@ -118,6 +129,9 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 			return nil
 		}
 		return err
+	}
+	if cfg.view != nil {
+		cfg.view.welcome(len(cfg.pokedex), cfg.save != nil)
 	}
 	return runREPL(cfg, in)
 }
