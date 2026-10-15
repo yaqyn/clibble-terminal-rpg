@@ -1,9 +1,9 @@
 ![Clibble — A little wild in your terminal.](readme-assets/cover.webp)
 
-# Clibble — A field guide for your next catch
+# Clibble — A little wild in your terminal
 
 Explore Pokemon locations, catch what you find, and build a collection worth coming back to.
-Clibble is a terminal-first Pokemon field guide: discover locations, build a collection,
+Clibble is a terminal-first Pokemon catching adventure: discover locations, build a collection,
 and read creature records without leaving your shell. An optional local browser view
 complements the CLI when you want to browse saved records visually.
 Your collection stays on your device. No account, API key, or subscription.

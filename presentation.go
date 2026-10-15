@@ -20,14 +20,14 @@ func (v *terminalView) accent(text string) string {
 	if !v.color {
 		return text
 	}
-	hex := brand.Get().Colors.Azure
+	hex := brand.Get().Colors.Fern
 	var r, g, b int
 	fmt.Sscanf(hex, "#%02x%02x%02x", &r, &g, &b)
 	return fmt.Sprintf("\x1b[38;2;%d;%d;%dm%s\x1b[0m", r, g, b, text)
 }
 func (v *terminalView) title(text string) { fmt.Fprintf(v.out, "\n%s\n", v.accent(text)) }
 func (v *terminalView) welcome(count int, persistent bool) {
-	v.title(brand.Get().Name)
+	v.title(brand.Get().Name + " >_")
 	fmt.Fprintln(v.out, brand.Get().Tagline)
 	mode := "Temporary session"
 	if persistent {

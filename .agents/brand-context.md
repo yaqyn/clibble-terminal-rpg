@@ -3,9 +3,9 @@
 ## Brand
 
 - **Name:** Clibble.
-- **Category:** Independent Pokemon field guide and collection app.
+- **Category:** Independent terminal-first Pokemon catching adventure.
 - **Description:** Explore Pokemon locations, catch creatures, and keep a collection from your terminal; browse saved creatures in a local web view.
-- **Stage:** Released CLI, being redesigned under the Clibble identity.
+- **Stage:** Released CLI, renamed from Dexrove to Clibble.
 - **Owner:** Abdulrahman M. Yaqyn.
 
 ## Audience
@@ -22,14 +22,17 @@
 
 ## Personality and voice
 
-Curious, precise, approachable, composed. Use clear actions and brief recovery hints.
-Clibble combines the familiar “dex” with “rove,” connecting collection and exploration.
+Playful, curious, friendly, clear. Use clear actions and brief recovery hints.
+Clibble is pronounced “clib-ul”: a small, playful name with CLI tucked inside.
+The name was selected by the owner after rejecting tool-like and forced adventure names.
 The tagline is “A little wild in your terminal.” Avoid technical internals in user-facing status.
 
 ## Values and mission
 
 Ownership of local data, reliable saves, readable interfaces, and honest scope.
-Make a small Pokemon exploration tool enjoyable to use and easy to inspect.
+Make discovering and catching Pokemon feel like a small adventure at the prompt.
+Use warm character art for brand imagery; keep actual CLI output readable and concise.
+The cover is a conceptual title screen, not a promise of a navigable ASCII world.
 
 ## Goals
 

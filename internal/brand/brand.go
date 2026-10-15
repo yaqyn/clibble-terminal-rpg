@@ -9,7 +9,7 @@ import (
 //go:embed identity.json
 var files embed.FS
 
-type Palette struct{ Cobalt, Ink, Mist, Cloud, Slate, Azure string }
+type Palette struct{ Primary, Ink, Mist, Cloud, Slate, Fern string }
 type Identity struct {
 	Name, Slug, Tagline string
 	Colors              Palette

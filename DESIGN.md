@@ -1,14 +1,14 @@
 ---
 version: alpha
 name: Clibble
-description: A Pokemon field guide shaped by exploration, clear records, and local ownership.
+description: A small Pokemon catching adventure that begins at the terminal prompt.
 colors:
-  primary: "#315dcd"
-  text: "#192b46"
-  background: "#edf2f9"
-  surface: "#ffffff"
-  muted: "#53637a"
-  terminal-accent: "#88baff"
+  primary: "#365b43"
+  text: "#142a25"
+  background: "#eef3e7"
+  surface: "#fbfcf5"
+  muted: "#526b5d"
+  terminal-accent: "#a7c78b"
 typography:
   sans:
     fontFamily: "Manrope, system-ui, sans-serif"
@@ -37,23 +37,28 @@ components:
 
 ## Creative direction
 
-The reference is a contemporary field atlas: a route, a clear species record,
-and space to notice what matters. The memorable feature is the open-route D mark.
-The terminal is the primary product; the read-only browser view is a complement.
-The interface supports that motif with calm cobalt and mist surfaces, rather
-than reproducing a game console or turning the app into a dashboard of metrics.
+The reference is a friendly terminal game's title screen: a cursor leading into
+character-art grass, a tiny creature glimpsed along the trail, and room to type.
+The memorable feature is the prompt becoming a path. Clibble is pronounced
+“clib-ul”; CLI is tucked into a name that sounds like a small companion.
+“A little wild in your terminal.” is the invitation.
 
-Clibble means dex + rove. “A little wild in your terminal.” gives the three actions equal
-weight. The audience is terminal-comfortable Pokemon fans; the web companion
-makes saved records easier to browse. English is the supported interface language;
-this is not a Japan-market product merely because its data comes from Pokemon.
+The terminal is the main product. Keep its actual output linear, quick to scan,
+and respectful of the user's font and background. The cover can express the
+imagined world; it must not claim an ASCII map renderer, battles, or movement.
+The read-only web companion is a quiet collection album with pine and fern
+accents, pale leaf surfaces, and the same prompt-and-cursor mark.
+
+The primary audience is terminal-comfortable Pokemon fans. English is the
+supported interface language; the data source does not make this a Japan-market
+product. The brand is playful; errors and recovery instructions remain precise.
 
 ## Ownership and mapping
 
 [internal/brand/identity.json](internal/brand/identity.json) is the canonical
 identity and palette. This file describes its roles. The Go brand package embeds
 those tokens. `scripts/brand_assets.py` generates web CSS variables and vector
-marks from the same source. The terminal renderer maps Azure to headings on a
+marks from the same source. The terminal renderer maps Fern to headings on a
 terminal's existing background; normal text inherits the terminal foreground.
 The README cover is generated raster artwork, with the exact name visible.
 
@@ -77,10 +82,16 @@ and announced. The web app is read-only; collecting stays in the CLI.
 
 ## Shape and restraint
 
-The D mark is a curved route with an open spine. Use it once in the header, not
-as decoration on every record. Rounded control corners belong to interactive
-controls; records are separated by spacing and purposeful borders. No mascot,
-third-party creature artwork, neon effects, or ornamental terminal frames.
+The mark is a chevron prompt followed by a block cursor on a pine tile. Its
+square-ended strokes recall a character grid. Use it once in the header. Keep
+records readable and controls familiar; the companion uses spacing and borders
+rather than simulated window chrome. No glossy dioramas, neon, cinematic effects,
+or third-party creature artwork in the product interface.
+
+The cover uses pine #142a25, ivory #eef3d9, fern #a7c78b, sage #617e68,
+and a small honey #e7be73 catch accent. These illustration colors are documented
+separately from the runtime palette. Runtime primary #365b43 provides legible
+links/buttons on the light companion; terminal fern #a7c78b is an optional accent.
 
 ## Verification
 
