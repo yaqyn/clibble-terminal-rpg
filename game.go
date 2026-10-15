@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/charmbracelet/colorprofile"
 	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 	"golang.org/x/term"
 )
@@ -423,7 +424,11 @@ func supportsGame(in io.Reader, out io.Writer) bool {
 func runGame(cfg *config, in io.Reader, out io.Writer) error {
 	tasks := newGameTasks(cfg.ctx)
 	defer tasks.close()
-	_, err := tea.NewProgram(newGame(cfg, tasks), tea.WithContext(cfg.ctx), tea.WithInput(in), tea.WithOutput(out)).Run()
+	profile := colorprofile.ASCII
+	if cfg.view != nil && cfg.view.color {
+		profile = colorprofile.TrueColor
+	}
+	_, err := tea.NewProgram(newGame(cfg, tasks), tea.WithColorProfile(profile), tea.WithContext(cfg.ctx), tea.WithInput(in), tea.WithOutput(out)).Run()
 	if cfg.ctx.Err() != nil {
 		return cfg.ctx.Err()
 	}
