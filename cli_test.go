@@ -100,3 +100,24 @@ func TestCLIBatchReportsErrorsAndContinues(t *testing.T) {
 		t.Fatal("prompt polluted piped output")
 	}
 }
+
+func TestCLICountUsesSavedCollectionOffline(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "pokedex.json")
+	if err := savePokedex(path, map[string]pokeapi.Pokemon{"pidgey": {Name: "pidgey"}, "pikachu": {Name: "pikachu"}}); err != nil {
+		t.Fatal(err)
+	}
+	var out, errOut bytes.Buffer
+	if err := runCLI(context.Background(), []string{"-data", path, "count"}, strings.NewReader(""), &out, &errOut, false); err != nil {
+		t.Fatal(err)
+	}
+	if out.String() != "Caught Pokemon: 2\n" {
+		t.Fatal(out.String())
+	}
+	out.Reset()
+	if err := runCLI(context.Background(), []string{"-ephemeral", "count"}, strings.NewReader(""), &out, &errOut, false); err != nil {
+		t.Fatal(err)
+	}
+	if out.String() != "Caught Pokemon: 0\n" {
+		t.Fatal(out.String())
+	}
+}

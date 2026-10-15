@@ -50,6 +50,7 @@ func getCommands() map[string]cliCommand {
 		"catch":   {"catch <pokemon>", "Attempt to catch a Pokemon", 1, commandCatch},
 		"inspect": {"inspect <pokemon>", "Show a caught Pokemon's details", 1, commandInspect},
 		"pokedex": {"pokedex", "List your caught Pokemon", 0, commandPokedex},
+		"count":   {"count", "Show the number of caught Pokemon", 0, commandCount},
 	}
 }
 func commandExit(cfg *config, args ...string) error {
@@ -169,3 +170,8 @@ func commandPokedex(cfg *config, args ...string) error {
 	return nil
 }
 func validName(name string) bool { return pokeapi.ValidName(name) }
+
+func commandCount(cfg *config, args ...string) error {
+	_, err := fmt.Fprintf(cfg.out, "Caught Pokemon: %d\n", len(cfg.pokedex))
+	return err
+}

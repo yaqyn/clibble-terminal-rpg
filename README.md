@@ -67,7 +67,7 @@ also stops it. Use `-ephemeral` when you want a temporary collection.
 
 ## <img src="readme-assets/icons/usage.svg" width="24" height="24" alt=""> Usage
 
-Commands and Pokemon/area names are case-insensitive. Names use letters, digits,
+Use `count` to print the number of distinct caught Pokemon offline. Commands and Pokemon/area names are case-insensitive. Names use letters, digits,
 and hyphens. Missing or extra arguments show the command's usage.
 
 | Command | Result |
