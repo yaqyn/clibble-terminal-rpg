@@ -77,6 +77,7 @@ narration addresses the player as you. No automatic animation or artificial wait
 At 88 columns and above, scene/details sit beside the choices. Narrow terminals
 use a single column. Below 40 × 18, show a resize hint and allow safe exit.
 Long lists and records scroll; returning restores the prior selected item.
+Long narration and errors have a visible Tab continuation hint and message pages.
 The `-plain` mode keeps the linear command prompt, Tab completion, and bounded
 in-memory history. Bubble Tea or the line editor restores terminal mode on exit.
 Color is optional and never carries meaning alone. Piped output remains plain.

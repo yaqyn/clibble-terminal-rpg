@@ -53,6 +53,7 @@ a Pokemon and choose **Throw a Pokeball**. After a successful catch, choose
 | Esc / Backspace | Go back; cancel travel or exploration |
 | Left / Right | Browse destination pages |
 | `t` / `c` / `?` | Open travel / collection / field guide |
+| Tab | Read the next page of a longer message |
 | `r` | Retry a failed action |
 | `q` / Ctrl+C | Leave safely |
 

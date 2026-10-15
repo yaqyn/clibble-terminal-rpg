@@ -15,6 +15,7 @@ Esc/Backspace goes back. Left/right changes destination pages. `t`, `c`, and `?`
 open travel, collection, and help. `r` retries a failed action. Up/down scrolls
 long records/help; Home/End jump to the first/last item. Menus scroll to keep the
 selection visible. Return from an encounter or record restores your selection.
+Tab pages through narration or errors that do not fit the message box.
 `q` or Ctrl+C leaves. During a catch, additional actions are disabled until the
 outcome is settled. Shutdown cancels requests and waits for any active save before
 releasing the collection lock.

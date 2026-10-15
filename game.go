@@ -50,6 +50,7 @@ type gameModel struct {
 	screen                              string
 	cursor, width, height, detailOffset int
 	areaCursor, recordCursor            int
+	storyPage                           int
 	location, selected, recordFrom      string
 	locations                           pokeapi.Locations
 	encounters                          []string
@@ -78,6 +79,7 @@ func (m *gameModel) request(kind, message string, work func(context.Context) gam
 	m.pending = kind
 	m.problem = ""
 	m.narration = message
+	m.storyPage = 0
 	return m.tasks.start(func() tea.Msg { result := work(ctx); result.id = id; result.kind = kind; return result })
 }
 func (m *gameModel) travel(page *string) tea.Cmd {
@@ -109,6 +111,7 @@ func (m *gameModel) move(screen, narration string) {
 	m.detailOffset = 0
 	m.problem = ""
 	m.narration = narration
+	m.storyPage = 0
 }
 func (m *gameModel) camp() {
 	m.move("camp", "You pause at the trailhead. Your next adventure starts with a choice.")
@@ -234,6 +237,7 @@ func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.busy = false
+		m.storyPage = 0
 		m.pending = ""
 		if m.cancel != nil {
 			m.cancel()
@@ -305,6 +309,8 @@ func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		switch key {
+		case "tab":
+			m.storyPage = (m.storyPage + 1) % m.storyPages()
 		case "esc", "backspace":
 			m.back()
 		case "r":

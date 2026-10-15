@@ -10,6 +10,14 @@ import (
 )
 
 func (m *gameModel) bodyRows() int { return max(4, m.height-13) }
+func (m *gameModel) storyLines() []string {
+	story := m.narration
+	if m.problem != "" {
+		story = m.problem
+	}
+	return strings.Split(ansi.Wrap(story, max(1, m.width-8), ""), "\n")
+}
+func (m *gameModel) storyPages() int { return max(1, (len(m.storyLines())+2)/3) }
 func (m *gameModel) heading() string {
 	switch m.screen {
 	case "travel":
@@ -152,21 +160,21 @@ func (m *gameModel) View() tea.View {
 			lines = append(lines, left)
 		}
 	}
-	story := m.narration
-	if m.problem != "" {
-		story = m.problem
-	}
-	wrapped := strings.Split(ansi.Wrap(story, width-4, ""), "\n")
+	wrapped := m.storyLines()
+	page := m.storyPage % m.storyPages()
 	lines = append(lines, "┌"+strings.Repeat("─", width-2)+"┐")
 	for i := 0; i < 3; i++ {
 		s := ""
-		if i < len(wrapped) {
-			s = wrapped[i]
+		if i+page*3 < len(wrapped) {
+			s = wrapped[i+page*3]
 		}
 		s = ansi.Truncate(s, width-4, "…")
 		lines = append(lines, "│ "+s+strings.Repeat(" ", max(0, width-4-ansi.StringWidth(s)))+" │")
 	}
 	lines = append(lines, "└"+strings.Repeat("─", width-2)+"┘")
+	if m.storyPages() > 1 {
+		lines = append(lines, fmt.Sprintf("Tab: read more (%d/%d)", page+1, m.storyPages()))
+	}
 	footer := "↑↓ / j k: move   Enter: choose   Esc: back   q: leave"
 	if m.screen == "travel" {
 		footer = "↑↓: choose  Enter: travel  ←→: pages  Esc: back  q: leave"

@@ -44,6 +44,8 @@ func gameKey(m *gameModel, key string) tea.Cmd {
 		code = tea.KeyDown
 	case "up":
 		code = tea.KeyUp
+	case "tab":
+		code = tea.KeyTab
 	default:
 		code = []rune(key)[0]
 	}
@@ -228,5 +230,17 @@ func TestGameSmallScreenDoesNotActivateHiddenChoices(t *testing.T) {
 	}
 	if gameKey(m, "q") == nil {
 		t.Fatal("small screen prevented quitting")
+	}
+}
+
+func TestGameNarrowNarrationCanBeReadInFull(t *testing.T) {
+	m, _ := gameForTest(t)
+	m.width, m.height = 40, 18
+	if !strings.Contains(m.View().Content, "Tab: read more") {
+		t.Fatal("long narration lacks a continuation hint")
+	}
+	gameKey(m, "tab")
+	if !strings.Contains(m.View().Content, "Where will you go?") || m.screen != "camp" {
+		t.Fatal("continuation lost the story or activated a choice")
 	}
 }

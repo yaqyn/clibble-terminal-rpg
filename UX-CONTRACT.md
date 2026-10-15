@@ -26,7 +26,8 @@ There are no payments, accounts, deletion actions, or permission settings.
 - RPG navigation: arrows/j/k move, Enter/Space selects, Esc/Backspace goes back.
   Travel opens paged destinations; selecting one explores its encounter list.
   Select an encounter, attempt a catch, then inspect the saved record. Returning
-  restores the relevant selection. Empty areas and collections offer a next step.
+  restores the relevant selection. Tab pages through long narration/errors; text
+  is never available only in a truncated message. Empty areas and collections offer a next step.
 - Background work: show narration while pending, disable repeated actions, allow
   cancelling travel/exploration, and reject stale response IDs. Catch/save settles
   before another action. Failures retain prior location/collection and offer retry.
