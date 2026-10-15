@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yaqyn/clibble-pokemon-cli/internal/brand"
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
-	"github.com/yaqyn/clibble-pokemon-cli/internal/webui"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/brand"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/webui"
 )
 
 func companionHandler(path, authority string) http.Handler {

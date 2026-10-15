@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
 	"io"
 	"reflect"
 	"strings"

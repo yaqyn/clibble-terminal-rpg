@@ -8,7 +8,7 @@ Clibble brings an arrow-driven adventure to your terminal. Travel between locati
 inspect your catches offline, or browse saved records in the optional, read-only web companion.
 Six trails and ten original wildlings are bundled into the app. Play offline, with no account or API key.
 
-[Published releases](https://github.com/yaqyn/clibble-pokemon-cli/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
+[Published releases](https://github.com/yaqyn/clibble-terminal-rpg/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
 
 ## <img src="readme-assets/icons/features.svg" width="24" height="24" alt=""> Features
 
@@ -23,7 +23,7 @@ Six trails and ten original wildlings are bundled into the app. Play offline, wi
 The original-world forest build is currently available from source. Published
 v1.x archives predate this redesign. For those older versions, download the archive
 for your operating system and architecture from the
-[releases page](https://github.com/yaqyn/clibble-pokemon-cli/releases/latest), verify it against
+[releases page](https://github.com/yaqyn/clibble-terminal-rpg/releases/latest), verify it against
 `SHA256SUMS`, and extract it. Run `clibble` on Linux/macOS or `clibble.exe` on Windows.
 The compiled app includes the web interface and font; it needs no Go, Node, or Python runtime.
 The world, terminal scenery, companion, and font are bundled. Playing requires no internet connection.
@@ -31,8 +31,8 @@ The world, terminal scenery, companion, and font are bundled. Playing requires n
 To build from source, install the Go version declared in [go.mod](go.mod) or newer:
 
 ```bash
-git clone https://github.com/yaqyn/clibble-pokemon-cli.git
-cd clibble-pokemon-cli
+git clone https://github.com/yaqyn/clibble-terminal-rpg.git
+cd clibble-terminal-rpg
 go build -trimpath -o clibble .
 ```
 
@@ -163,7 +163,7 @@ Tests cover RPG navigation, cancellation, stale results, shutdown during saves,
 small-screen layouts, catch/escape outcomes, pagination, cached requests, malformed responses,
 timeouts, save recovery and locking, legacy-save discovery, plain CLI output,
 local web API boundaries, search, selection, empty states, and refresh failures.
-[CI](https://github.com/yaqyn/clibble-pokemon-cli/actions/workflows/ci.yml) runs native Go checks
+[CI](https://github.com/yaqyn/clibble-terminal-rpg/actions/workflows/ci.yml) runs native Go checks
 on Linux, macOS, and Windows. See [release preparation](docs/RELEASE.md) for packaging.
 
 ## <img src="readme-assets/icons/security.svg" width="24" height="24" alt=""> Security and limitations

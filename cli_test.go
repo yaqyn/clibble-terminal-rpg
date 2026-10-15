@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
 )
 
 func TestCLIHelpVersionAndInvalidCommandsHaveNoSaveSideEffects(t *testing.T) {

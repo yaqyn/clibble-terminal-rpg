@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
 )
 
 // meadowWorld is Clibble's bundled, original world. The legacy record shape is

@@ -1,4 +1,4 @@
-module github.com/yaqyn/clibble-pokemon-cli
+module github.com/yaqyn/clibble-terminal-rpg
 
 go 1.27.2
 

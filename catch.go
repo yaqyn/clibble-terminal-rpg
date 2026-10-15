@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
 )
 
 type catchResult struct {

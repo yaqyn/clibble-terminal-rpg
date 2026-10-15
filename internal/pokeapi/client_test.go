@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokecache"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokecache"
 )
 
 func TestResponsesAreCached(t *testing.T) {

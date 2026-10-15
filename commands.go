@@ -8,7 +8,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
 )
 
 var errExit = errors.New("exit requested")

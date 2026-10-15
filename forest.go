@@ -4,7 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"fmt"
 	"github.com/charmbracelet/x/ansi"
-	"github.com/yaqyn/clibble-pokemon-cli/internal/brand"
+	"github.com/yaqyn/clibble-terminal-rpg/internal/brand"
 	"strings"
 	"time"
 )
