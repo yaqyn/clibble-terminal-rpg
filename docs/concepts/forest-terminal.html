@@ -1,0 +1,86 @@
+<div id="clibble-directions" class="viz-carousel" aria-label="Clibble forest terminal directions">
+  <section data-variant="Rainy forest" aria-label="Rainy forest terminal concept"><div class="forest-game" data-theme="rain"><canvas width="192" height="112" aria-hidden="true"></canvas><div class="forest-hud"><span>Clibble · Concept</span><span class="supplies">12 Pokeballs</span></div><div class="forest-center"><div class="forest-title">Clibble</div><p class="forest-subtitle">A little wild in your terminal.</p><div class="forest-menu" aria-label="Game choices"></div></div><div class="forest-story" role="status" aria-live="polite">You hear the rain settle into the leaves.</div><div class="forest-keys">↑ ↓ choose · Enter select · Esc back</div></div></section>
+  <section data-variant="Sunlit clearing" aria-label="Sunlit clearing terminal concept" hidden><div class="forest-game" data-theme="day"><canvas width="192" height="112" aria-hidden="true"></canvas><div class="forest-hud"><span>Clibble · Concept</span><span class="supplies">12 Pokeballs</span></div><div class="forest-center"><div class="forest-title">Clibble</div><p class="forest-subtitle">Your next trail is waiting.</p><div class="forest-menu" aria-label="Game choices"></div></div><div class="forest-story" role="status" aria-live="polite">You feel a breeze move through the clearing.</div><div class="forest-keys">↑ ↓ choose · Enter select · Esc back</div></div></section>
+  <section data-variant="Moonlit grove" aria-label="Moonlit grove terminal concept" hidden><div class="forest-game" data-theme="night"><canvas width="192" height="112" aria-hidden="true"></canvas><div class="forest-hud"><span>Clibble · Concept</span><span class="supplies">12 Pokeballs</span></div><div class="forest-center"><div class="forest-title">Clibble</div><p class="forest-subtitle">Follow the little lights.</p><div class="forest-menu" aria-label="Game choices"></div></div><div class="forest-story" role="status" aria-live="polite">You watch the fireflies gather by the water.</div><div class="forest-keys">↑ ↓ choose · Enter select · Esc back</div></div></section>
+</div>
+<style>
+#clibble-directions .forest-game{--pine:#10291e;--text:#e3efd4;--fern:#b1d18e;position:relative;height:490px;overflow:hidden;background:var(--pine);color:var(--text);font:14px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+#clibble-directions canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#clibble-directions .forest-hud{position:absolute;left:20px;right:110px;top:16px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;color:#bbd0aa;font-size:12px}
+#clibble-directions .forest-center{position:absolute;inset:78px 12px 98px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+#clibble-directions .forest-title{font-size:36px;font-weight:700;letter-spacing:1px;color:#e3efd4;line-height:1.15}
+#clibble-directions .forest-subtitle{font-size:12px;color:#b1c8a2;margin:0 0 12px;text-align:center}
+#clibble-directions .forest-menu{display:flex;flex-direction:column;gap:4px;min-width:190px;max-width:270px}
+#clibble-directions .forest-menu button{font:inherit;min-height:36px;padding:5px 14px;border:0;background:#153221;color:#deebcf;text-align:center;cursor:inherit;position:relative}
+#clibble-directions .forest-menu button[data-selected="true"]{background:#b1d18e;color:#153221}
+#clibble-directions .forest-menu button[data-selected="true"]::before{content:">";position:absolute;left:10px}
+#clibble-directions .forest-menu button:focus-visible{outline:2px solid #edf4d7;outline-offset:3px}
+#clibble-directions .forest-story{position:absolute;bottom:48px;left:12%;right:12%;text-align:center;font-size:13px;color:#e3efd4;background:#10291e;padding:8px 12px;min-height:42px}
+#clibble-directions .forest-keys{position:absolute;bottom:18px;left:8px;right:8px;text-align:center;color:#b1c8a2;font-size:11px}
+#clibble-directions [data-theme="day"] .forest-center{inset:68px 12px 114px}
+#clibble-directions [data-theme="day"] .forest-menu{display:grid;grid-template-columns:1fr 1fr;min-width:270px}
+#clibble-directions [data-theme="day"] .forest-menu button{background:#234532}
+#clibble-directions [data-theme="day"] .forest-menu button[data-selected="true"]{background:#d4e5a7;color:#153221}
+#clibble-directions [data-theme="night"] .forest-title{font-size:30px;letter-spacing:4px}
+#clibble-directions [data-theme="night"] .forest-center{inset:85px 12px 88px}
+#clibble-directions [data-theme="night"] .forest-menu button{background:#112d28}
+#clibble-directions [data-theme="night"] .forest-menu button[data-selected="true"]{background:#a5cbb0;color:#102a24}
+@media(max-width:420px){#clibble-directions .forest-hud{right:20px;top:14px;max-width:190px;gap:2px}#clibble-directions .forest-story{left:5%;right:5%}#clibble-directions .forest-title{font-size:32px}}
+</style>
+<script>
+(() => {
+ const root=document.getElementById('clibble-directions');
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ const themes={rain:{sky:'#10291e',far:'#17392a',tree:'#20503a',light:'#3e6a43',grass:'#284b2b',drop:'#638e77'},day:{sky:'#264b35',far:'#315d3d',tree:'#3a7043',light:'#689255',grass:'#3e6338',drop:'#b2c98d'},night:{sky:'#0b2525',far:'#123731',tree:'#194b3d',light:'#316249',grass:'#173e30',drop:'#c2db9c'}};
+ const games=[];
+ root.querySelectorAll('.forest-game').forEach((el,index)=>{
+  const state={screen:'title',selection:0,balls:12,tries:3,motion:!reduced.matches,frame:0};
+  const menu=el.querySelector('.forest-menu'),story=el.querySelector('.forest-story'),canvas=el.querySelector('canvas'),ctx=canvas.getContext('2d');
+  const choices=()=>state.screen==='title'?['Start','Motion: '+(state.motion?'on':'off'),'Leave']:state.screen==='catch'?(state.tries>0&&state.balls>0?['Throw a Pokeball','Return to clearing']:['Return to clearing']):['Travel','Catch','Collection','Back to title'];
+  function render(){
+   el.querySelector('.supplies').textContent=state.screen==='catch'?`Tries ${state.tries}/3 · Balls ${state.balls}`:`${state.balls} Pokeballs`;
+   menu.replaceChildren(...choices().map((text,i)=>{const b=document.createElement('button');b.type='button';b.className='cursor-interaction';b.textContent=text;b.dataset.selected=String(i===state.selection);b.setAttribute('aria-pressed',String(i===state.selection));b.addEventListener('focus',()=>{state.selection=i;highlight()});b.addEventListener('click',()=>activate(i));return b}));
+  }
+  function highlight(){menu.querySelectorAll('button').forEach((b,i)=>{b.dataset.selected=String(i===state.selection);b.setAttribute('aria-pressed',String(i===state.selection))})}
+  function activate(i){
+   if(state.screen==='title'){
+    if(i===0){state.screen='camp';story.textContent='You arrive in the clearing. Where will you go?'}
+    else if(i===1){state.motion=!state.motion;story.textContent=state.motion?'You listen to the forest.':'You enjoy a quiet, still forest.'}
+    else{story.textContent='You can return whenever you feel like exploring.'}
+   }else if(state.screen==='catch'){
+    if(choices()[i]==='Return to clearing'){state.screen='camp';story.textContent='You return to the clearing. Your remaining tries stay the same.'}
+    else if(state.tries>0&&state.balls>0){state.tries--;state.balls--;story.textContent=state.tries?`You throw a Pokeball. Pidgey slips free. ${state.tries} tries remain.`:'You have used your three tries. You let Pidgey go.'}
+    else{story.textContent='You have no tries left for this encounter.'}
+   }else if(i===0){story.textContent='You follow the trail to a forest clearing.'}
+   else if(i===1){state.screen='catch';story.textContent=state.tries>0&&state.balls>0?`You spot Pidgey in the grass. You have ${state.tries} tries.`:'You have used this encounter’s tries. You can take another trail.'}
+   else if(i===2){story.textContent='You open your collection. Your first catch is still out there.'}
+   else{state.screen='title';story.textContent='You pause beneath the trees.'}
+   state.selection=0;render();
+  }
+  menu.addEventListener('keydown',e=>{
+   if(['ArrowDown','ArrowRight','ArrowUp','ArrowLeft'].includes(e.key)){e.preventDefault();const next=e.key==='ArrowDown'||e.key==='ArrowRight'?1:-1;state.selection=(state.selection+next+choices().length)%choices().length;menu.children[state.selection].focus();highlight()}
+   if(e.key==='Escape'){e.preventDefault();state.screen='camp';state.selection=0;story.textContent='You return to the clearing.';render();menu.children[0].focus()}
+  });
+  function draw(t){
+   const c=themes[el.dataset.theme];ctx.fillStyle=c.sky;ctx.fillRect(0,0,192,112);
+   const tree=(x,y,s,shade)=>{ctx.fillStyle=shade;for(let row=0;row<5;row++){const wide=(row+2)*s;ctx.fillRect(x-wide,y+row*s*2,wide*2,s*3)}ctx.fillStyle=c.far;ctx.fillRect(x-s,y+s*11,s*2,s*4)};
+   for(let i=0;i<14;i++){const x=(i*19+index*7)%210-9;if(x>66&&x<126)continue;tree(x,12+(i%3)*4,2,c.far)}
+   ctx.fillStyle=c.grass;ctx.fillRect(0,91,192,21);
+   for(let i=0;i<11;i++){const x=(i*23+9)%210-8;if(x>53&&x<139)continue;tree(x,15+(i%3)*9,3,i%2?c.tree:c.light)}
+   // A deliberately quiet clearing protects the central text from the scene.
+   ctx.fillStyle=c.sky;ctx.fillRect(60,22,72,63);
+   if(el.dataset.theme==='night'){ctx.fillStyle='#81a997';ctx.fillRect(151,10,6,6);ctx.fillStyle=c.sky;ctx.fillRect(149,8,6,6);ctx.fillStyle='#20483d';ctx.fillRect(58,94,76,10);ctx.fillStyle='#3b6654';ctx.fillRect(72,96,45,1)}
+   for(let i=0;i<55;i++){const x=(i*37)%192,y=91+(i*13)%21;if(x>67&&x<125&&y<103)continue;ctx.fillStyle=i%3?c.tree:c.light;ctx.fillRect(x,y,1,2)}
+   if(state.motion){
+    if(el.dataset.theme==='rain'){ctx.fillStyle=c.drop;for(let i=0;i<37;i++){const x=(i*31+Math.floor(t/8))%192,y=(i*17+Math.floor(t/2))%112;if(x>57&&x<135&&y>18&&y<91)continue;ctx.fillRect(x,y,1,2)}}
+    else{ctx.fillStyle=c.drop;for(let i=0;i<12;i++){const x=(i*41+Math.floor(t/10))%192,y=25+(i*17)%65+Math.round(Math.sin(t/18+i)*3);if(x>56&&x<136&&y<90)continue;ctx.fillRect(x,y,1,1)}}
+   }
+  }
+  render();draw(0);games.push({el,state,draw});
+  if(globalThis.Tweak){const tweak=new Tweak({container:el,onChange:()=>{render();draw(state.frame)}});tweak.addToggle(state,'motion',{label:'Ambient motion'})}
+ });
+ let last=0;
+ function animate(now){if(now-last>100){last=now;for(const game of games){if(!game.el.closest('[hidden]')){if(game.state.motion&&!reduced.matches)game.state.frame++;game.draw(game.state.frame)}}}requestAnimationFrame(animate)}
+ requestAnimationFrame(animate);
+})();
+</script>
