@@ -1,7 +1,13 @@
-.PHONY: build test vet check vuln dist
+.PHONY: build test vet check vuln dist brand ui-test
+
+brand:
+	python3 scripts/brand_assets.py
+
+ui-test:
+	npm test
 
 build:
-	go build -trimpath -o pokedex .
+	go build -trimpath -o dexrove .
 
 test:
 	go test -race ./...

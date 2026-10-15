@@ -24,17 +24,17 @@ def main():
     checksums = []
     for target_os in ("linux", "darwin", "windows"):
         for arch in ("amd64", "arm64"):
-            with tempfile.TemporaryDirectory(prefix="pokedex-release-") as temporary:
-                binary = Path(temporary) / ("pokedex.exe" if target_os == "windows" else "pokedex")
+            with tempfile.TemporaryDirectory(prefix="dexrove-release-") as temporary:
+                binary = Path(temporary) / ("dexrove.exe" if target_os == "windows" else "dexrove")
                 env = dict(os.environ, GOOS=target_os, GOARCH=arch, CGO_ENABLED="0")
                 subprocess.run(
                     ["go", "build", "-trimpath", "-ldflags", f"-s -w -X main.version={version}", "-o", str(binary), "."],
                     cwd=root, env=env, check=True,
                 )
                 suffix = ".zip" if target_os == "windows" else ".tar.gz"
-                artifact = output / f"pokedex_{version}_{target_os}_{arch}{suffix}"
+                artifact = output / f"dexrove_{version}_{target_os}_{arch}{suffix}"
                 files = [(binary, binary.name), (root / "README.md", "README.md"), (root / "LICENSE", "LICENSE"), (root / "THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md")]
-                for folder in ("readme-assets", "licenses"):
+                for folder in ("readme-assets", "licenses", "docs"):
                     files.extend((source, str(source.relative_to(root))) for source in sorted((root / folder).rglob("*")) if source.is_file())
                 if target_os == "windows":
                     with zipfile.ZipFile(artifact, "w", zipfile.ZIP_DEFLATED) as archive:
