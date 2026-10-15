@@ -178,9 +178,12 @@ func (m *gameModel) choices() []gameChoice {
 		return append(choices, gameChoice{"explore", "Explore again", "Look around this location again"}, gameChoice{"travel", "Travel onward", "Open your map"}, gameChoice{"back", "Return to trailhead", "Take a moment to plan"})
 	case "encounter":
 		if _, ok := m.cfg.pokedex[m.selected]; ok {
-			return []gameChoice{{"inspect", "Inspect your catch", "Read its saved field record"}, {"back", "Return to the grass", "Look for another wildling"}, {"collection", "Field journal", "Browse your caught wildling"}}
+			return []gameChoice{{"inspect", "Inspect your catch", "Read its saved field record"}, {"back", "Return to the grass", "Meet another wildling"}, {"collection", "Field journal", "Browse your caught wildlings"}}
 		}
-		return []gameChoice{{"throw", "Offer a catch seed", "Attempt a catch; some wildling may escape"}, {"back", "Return to the grass", "Leave this encounter"}}
+		if err := m.cfg.progress.allowance(m.selected, m.cfg.now()); err != nil {
+			return []gameChoice{{"rest", "Check when to return", err.Error()}, {"back", "Return to the grass", "Meet another wildling"}, {"travel", "Travel onward", "Try another trail"}}
+		}
+		return []gameChoice{{"throw", "Offer a catch seed", "Attempt a catch; some wildlings may escape"}, {"back", "Return to the grass", "Leave this encounter"}}
 	case "collection":
 		choices := make([]gameChoice, 0, len(m.cfg.pokedex)+1)
 		for _, name := range sortedKeys(m.cfg.pokedex) {
@@ -198,6 +201,11 @@ func (m *gameModel) choose() tea.Cmd {
 	}
 	choice := choices[m.cursor]
 	switch choice.id {
+	case "rest":
+		if err := m.cfg.progress.allowance(m.selected, m.cfg.now()); err != nil {
+			m.narration = "You give the forest a little time. " + err.Error() + "."
+			m.storyPage = 0
+		}
 	case "start":
 		m.camp()
 	case "settings":
@@ -242,7 +250,7 @@ func (m *gameModel) choose() tea.Cmd {
 		case "area":
 			m.areaCursor = m.cursor
 			m.selected = choice.id
-			m.move("encounter", "You spot "+placeName(choice.id)+" in the grass. You move a little closer. What will you do?")
+			m.move("encounter", "You spot "+placeName(choice.id)+" in the grass. "+wildlingStories[choice.id]+" What will you do?")
 		case "collection":
 			m.recordCursor = m.cursor
 			m.record = m.cfg.pokedex[choice.id]
@@ -288,6 +296,9 @@ func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "settings":
 			m.cfg.progress = msg.catch.progress
 			m.narration = "You choose how the forest feels. Your preference is saved."
+			if m.cfg.save == nil {
+				m.narration = "You choose how the forest feels for this temporary session."
+			}
 			return m, m.animate()
 		case "travel":
 			m.locations = msg.locations

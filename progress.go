@@ -2,29 +2,30 @@ package main
 
 import (
 	"fmt"
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 	"time"
+
+	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 )
 
-type mapPokemon = map[string]pokeapi.Pokemon
+type journalRecords = map[string]pokeapi.Pokemon
 
-const ballCapacity = 12
-const ballInterval = 5 * time.Minute
+const seedCapacity = 12
+const seedInterval = 5 * time.Minute
 const encounterWindow = 30 * time.Minute
 
 type encounterBudget struct {
-	Throws int       `json:"throws"`
+	Offers int       `json:"offers"`
 	Until  time.Time `json:"until"`
 }
 type gameProgress struct {
-	Balls      int                        `json:"balls"`
+	Seeds      int                        `json:"seeds"`
 	RefillAt   time.Time                  `json:"refill_at"`
 	Encounters map[string]encounterBudget `json:"encounters"`
 	MotionOff  bool                       `json:"motion_off,omitempty"`
 }
 
 func freshProgress(now time.Time) gameProgress {
-	return gameProgress{Balls: ballCapacity, RefillAt: now, Encounters: map[string]encounterBudget{}}
+	return gameProgress{Seeds: seedCapacity, RefillAt: now, Encounters: map[string]encounterBudget{}}
 }
 func (p gameProgress) refreshed(now time.Time) gameProgress {
 	if p.Encounters == nil {
@@ -38,23 +39,23 @@ func (p gameProgress) refreshed(now time.Time) gameProgress {
 		}
 	}
 	if now.After(p.RefillAt) {
-		units := int(now.Sub(p.RefillAt) / ballInterval)
-		next.Balls = min(ballCapacity, p.Balls+units)
-		if next.Balls == ballCapacity {
+		units := int(now.Sub(p.RefillAt) / seedInterval)
+		next.Seeds = min(seedCapacity, p.Seeds+units)
+		if next.Seeds == seedCapacity {
 			next.RefillAt = now
 		} else {
-			next.RefillAt = p.RefillAt.Add(time.Duration(units) * ballInterval)
+			next.RefillAt = p.RefillAt.Add(time.Duration(units) * seedInterval)
 		}
 	}
 	return next
 }
 func (p gameProgress) allowance(name string, now time.Time) error {
 	p = p.refreshed(now)
-	if e, ok := p.Encounters[name]; ok && e.Throws >= 3 {
+	if e, ok := p.Encounters[name]; ok && e.Offers >= 3 {
 		return fmt.Errorf("%s needs a rest; try again in %s", placeName(name), e.Until.Sub(now).Round(time.Second))
 	}
-	if p.Balls == 0 {
-		return fmt.Errorf("your pouch is empty; your next catch seed arrives in %s", p.RefillAt.Add(ballInterval).Sub(now).Round(time.Second))
+	if p.Seeds == 0 {
+		return fmt.Errorf("your pouch is empty; your next catch seed arrives in %s", p.RefillAt.Add(seedInterval).Sub(now).Round(time.Second))
 	}
 	return nil
 }
@@ -64,7 +65,7 @@ func (c *config) now() time.Time {
 	}
 	return time.Now()
 }
-func (c *config) persist(owned mapPokemon, p gameProgress) error {
+func (c *config) persist(owned journalRecords, p gameProgress) error {
 	if c.saveProgress != nil {
 		return c.saveProgress(owned, p)
 	}

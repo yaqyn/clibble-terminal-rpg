@@ -4,6 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"fmt"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/brand"
 	"strings"
 	"time"
 )
@@ -20,7 +21,16 @@ type forestScene struct {
 	base          []forestCell
 }
 
-var forestPalette = []string{"16;41;30", "23;57;42", "32;80;58", "62;106;67", "177;209;142", "227;239;212"}
+var forestPalette = func() []string {
+	p := brand.Get().Forest
+	result := []string{}
+	for _, hex := range []string{p.Pine, p.Canopy, p.Fern, p.Leaf, p.Selection, p.Ivory} {
+		var r, g, b int
+		fmt.Sscanf(hex, "#%02x%02x%02x", &r, &g, &b)
+		result = append(result, fmt.Sprintf("%d;%d;%d", r, g, b))
+	}
+	return result
+}()
 
 func (s *forestScene) prepare(width, height int) {
 	if s.width == width && s.height == height && s.base != nil {
@@ -184,7 +194,7 @@ func (m *gameModel) forestView() tea.View {
 	centered := func(y int, s string) { s = ansi.Truncate(s, w-6, "…"); text((w-ansi.StringWidth(s))/2, y, s, 5, 0) }
 	p := m.cfg.progress.refreshed(m.cfg.now())
 	text(2, 0, " Clibble >_ ", 4, 0)
-	hud := fmt.Sprintf(" %d seeds  /  %d befriended ", p.Balls, len(m.cfg.pokedex))
+	hud := fmt.Sprintf(" %d seeds  /  %d befriended ", p.Seeds, len(m.cfg.pokedex))
 	text(max(2, w-len(hud)-2), 1, hud, 5, 0)
 	panelWidth := min(54, w-6)
 	left := (w - panelWidth) / 2
@@ -218,8 +228,8 @@ func (m *gameModel) forestView() tea.View {
 	}
 	status := "You carry catch seeds. Approach gently."
 	if m.screen == "encounter" {
-		tries := 3 - p.Encounters[m.selected].Throws
-		status = fmt.Sprintf("%d / 3 tries left  |  %d catch seeds", tries, p.Balls)
+		tries := 3 - p.Encounters[m.selected].Offers
+		status = fmt.Sprintf("%d / 3 tries left  |  %d catch seeds", tries, p.Seeds)
 		if e := p.Encounters[m.selected]; tries == 0 {
 			status = "Let them rest: " + e.Until.Sub(m.cfg.now()).Round(time.Second).String()
 		}

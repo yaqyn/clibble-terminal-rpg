@@ -47,12 +47,12 @@ func attemptCatch(ctx context.Context, client pokemonAPI, owned map[string]pokea
 		return catchResult{}, err
 	}
 	budget := progress.refreshed(now)
-	budget.Balls--
+	budget.Seeds--
 	encounter := budget.Encounters[p.Name]
 	if encounter.Until.IsZero() {
 		encounter.Until = now.Add(encounterWindow)
 	}
-	encounter.Throws++
+	encounter.Offers++
 	budget.Encounters[p.Name] = encounter
 	next := copyCollection(owned)
 	caught := random() < catchProbability(p.BaseExperience)

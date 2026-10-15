@@ -81,3 +81,17 @@ func (meadowWorld) GetPokemon(ctx context.Context, name string) (pokeapi.Pokemon
 	}
 	return p, nil
 }
+
+// Each wildling has a small, authored character moment; no remote lore or assets.
+var wildlingStories = map[string]string{
+	"mosskin":    "It peeks from a mossy hood, carrying a fallen leaf like an umbrella.",
+	"fernlet":    "It uncurls a frond and waves as though it has been expecting you.",
+	"puddlehop":  "It skips between raindrops, leaving tiny rings in the puddles.",
+	"reedwhisk":  "It braids river reeds into a nest that floats behind it.",
+	"dewbell":    "A clear note rings out whenever a dewdrop touches its petals.",
+	"bramblebun": "It offers you a berry, then shyly hides behind its own brambles.",
+	"cinderpip":  "Its little ember keeps a patch of grass warm through the rain.",
+	"glimwing":   "Its wings collect moonlight and scatter it like dandelion seeds.",
+	"hushroot":   "You almost mistake it for an old root until it opens one sleepy eye.",
+	"sunmuff":    "It shakes the rain from its fluffy crown and turns toward the light.",
+}

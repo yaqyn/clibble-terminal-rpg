@@ -10,7 +10,9 @@ import (
 var files embed.FS
 
 type Palette struct{ Primary, Ink, Mist, Cloud, Slate, Fern string }
+type ForestPalette struct{ Pine, Canopy, Fern, Leaf, Selection, Ivory string }
 type Identity struct {
+	Forest              ForestPalette
 	Name, Slug, Tagline string
 	Colors              Palette
 }

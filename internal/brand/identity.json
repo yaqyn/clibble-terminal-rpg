@@ -9,5 +9,13 @@
     "cloud": "#fbfcf5",
     "slate": "#526b5d",
     "fern": "#a7c78b"
+  },
+  "forest": {
+    "pine": "#10291e",
+    "canopy": "#17392a",
+    "fern": "#20503a",
+    "leaf": "#3e6a43",
+    "selection": "#b1d18e",
+    "ivory": "#e3efd4"
   }
 }

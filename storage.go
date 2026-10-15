@@ -61,11 +61,11 @@ func loadGame(path string) (map[string]pokeapi.Pokemon, gameProgress, error) {
 			return nil, gameProgress{}, fmt.Errorf("missing game progress")
 		}
 		progress = *saved.Progress
-		if progress.Balls < 0 || progress.Balls > ballCapacity || progress.RefillAt.IsZero() || progress.Encounters == nil {
+		if progress.Seeds < 0 || progress.Seeds > seedCapacity || progress.RefillAt.IsZero() || progress.Encounters == nil {
 			return nil, gameProgress{}, fmt.Errorf("invalid game progress")
 		}
 		for name, e := range progress.Encounters {
-			if name == "" || len(name) > 100 || e.Throws < 1 || e.Throws > 3 || e.Until.IsZero() {
+			if name == "" || len(name) > 100 || e.Offers < 1 || e.Offers > 3 || e.Until.IsZero() {
 				return nil, gameProgress{}, fmt.Errorf("invalid encounter budget")
 			}
 		}

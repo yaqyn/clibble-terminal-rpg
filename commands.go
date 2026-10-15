@@ -54,11 +54,11 @@ func getCommands() map[string]cliCommand {
 		"exit":       {"exit", "Leave Clibble", 0, commandExit},
 		"map":        {"map", "Display the next 20 location areas", 0, commandMap},
 		"mapb":       {"mapb", "Display the previous 20 location areas", 0, commandMapBack},
-		"explore":    {"explore <area>", "List wildling in a location area", 1, commandExplore},
+		"explore":    {"explore <area>", "Meet wildlings on a trail", 1, commandExplore},
 		"catch":      {"catch <wildling>", "Attempt to catch a wildling", 1, commandCatch},
 		"inspect":    {"inspect <wildling>", "Show a caught wildling's details", 1, commandInspect},
-		"collection": {"collection", "List your caught wildling", 0, commandPokedex},
-		"pokedex":    {"pokedex", "Alias for collection", 0, commandPokedex},
+		"collection": {"collection", "List your caught wildlings", 0, commandPokedex},
+		"pokedex":    {"pokedex", "Legacy alias for collection", 0, commandPokedex},
 		"count":      {"count", "Show the number of caught wildling", 0, commandCount},
 	}
 }
@@ -122,7 +122,7 @@ func commandExplore(cfg *config, args ...string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(cfg.out, "Found wildling:")
+	fmt.Fprintln(cfg.out, "Wildlings on this trail:")
 	for _, encounter := range area.PokemonEncounters {
 		fmt.Fprintf(cfg.out, " - %s\n", encounter.Pokemon.Name)
 	}
@@ -139,7 +139,7 @@ func commandCatch(cfg *config, args ...string) error {
 		fmt.Fprintf(cfg.out, "%s is already in your collection.\n", args[0])
 		return nil
 	}
-	fmt.Fprintf(cfg.out, "Throwing a catch seed at %s...\n", args[0])
+	fmt.Fprintf(cfg.out, "Offering a catch seed to %s...\n", args[0])
 	result, err := attemptCatch(cfg.ctx, cfg.client, cfg.pokedex, cfg.random, cfg.persist, cfg.progress, cfg.now(), args[0])
 	if err != nil {
 		return err
@@ -149,7 +149,7 @@ func commandCatch(cfg *config, args ...string) error {
 		return nil
 	}
 	cfg.progress = result.progress
-	fmt.Fprintf(cfg.out, "Catch seeds: %d/%d; tries left: %d/3\n", cfg.progress.Balls, ballCapacity, 3-cfg.progress.Encounters[result.pokemon.Name].Throws)
+	fmt.Fprintf(cfg.out, "Catch seeds: %d/%d; tries left: %d/3\n", cfg.progress.Seeds, seedCapacity, 3-cfg.progress.Encounters[result.pokemon.Name].Offers)
 	if !result.caught {
 		fmt.Fprintf(cfg.out, "%s escaped!\n", result.pokemon.Name)
 		return nil

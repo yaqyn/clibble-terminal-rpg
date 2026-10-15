@@ -23,7 +23,7 @@ func TestForestMenuIsCenteredAndSceneryCannotCoverSelection(t *testing.T) {
 	}
 	before := m.cfg.progress
 	m.Update(forestTick{})
-	if m.cfg.progress.Balls != before.Balls || len(m.cfg.progress.Encounters) != len(before.Encounters) {
+	if m.cfg.progress.Seeds != before.Seeds || len(m.cfg.progress.Encounters) != len(before.Encounters) {
 		t.Fatal("weather changed gameplay")
 	}
 	if !strings.Contains(m.View().Content, "> Travel") {
@@ -35,7 +35,7 @@ func TestMotionSettingPersistsAndFocusStopsTicks(t *testing.T) {
 	m.cfg.view = &terminalView{color: true}
 	m.cfg.progress = freshProgress(time.Now())
 	var saved gameProgress
-	m.cfg.saveProgress = func(_ mapPokemon, p gameProgress) error { saved = p; return nil }
+	m.cfg.saveProgress = func(_ journalRecords, p gameProgress) error { saved = p; return nil }
 	m.move("settings", "Choose motion")
 	gameComplete(t, m, gameKey(m, "enter"))
 	if !saved.MotionOff || m.animated() {

@@ -44,7 +44,7 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 	noMotion := flags.Bool("no-motion", false, "Disable forest animation for this session")
 	dataPath := flags.String("data", "", "JSON save path (default: user configuration directory/clibble/collection.json)")
 	ephemeral := flags.Bool("ephemeral", false, "Use a temporary collection without loading or writing saves")
-	timeout := flags.Duration("timeout", 10*time.Second, "Maximum duration of each API request")
+	timeout := flags.Duration("timeout", 10*time.Second, "Legacy compatibility flag; offline play does not use it")
 	flags.Usage = func() {
 		fmt.Fprintln(errOut, "Usage: clibble [flags] [command [argument]]\n\nStart an interactive session or run one command. Use 'clibble help' for commands.\n\nFlags:")
 		flags.PrintDefaults()
