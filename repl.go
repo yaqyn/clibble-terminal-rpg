@@ -31,7 +31,7 @@ func execute(cfg *config, words []string) error {
 		return fmt.Errorf("Usage: %s", cmd.name)
 	}
 	if len(args) > 0 && !validName(args[0]) {
-		return fmt.Errorf("use a Pokemon or area name containing letters, numbers, and hyphens")
+		return fmt.Errorf("use a wildling or area name containing letters, numbers, and hyphens")
 	}
 	return cmd.callback(cfg, args...)
 }

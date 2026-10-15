@@ -59,7 +59,7 @@ func TestREPLCatchInspectPokedex(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"you have not caught that pokemon", "pidgey was caught!", "Name: pidgey", "Height: 3", "Weight: 18", "Your collection:\n - pidgey", "Leaving Clibble. See you on the next trail."} {
+	for _, want := range []string{"you have not caught that wildling", "pidgey was caught!", "Name: pidgey", "Height: 3", "Weight: 18", "Your collection:\n - pidgey", "Leaving Clibble. See you on the next trail."} {
 		if !strings.Contains(out.String(), want) {
 			t.Errorf("missing %q in %s", want, out.String())
 		}
@@ -127,7 +127,7 @@ func TestPaginationBoundariesAndFailure(t *testing.T) {
 }
 func TestProbabilityDecreases(t *testing.T) {
 	if catchProbability(50) <= catchProbability(300) {
-		t.Fatal("stronger Pokemon should be harder")
+		t.Fatal("stronger wildling should be harder")
 	}
 	if catchProbability(-1) != 1 {
 		t.Fatal("negative experience invalid")

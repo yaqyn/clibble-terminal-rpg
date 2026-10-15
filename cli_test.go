@@ -20,7 +20,7 @@ func TestCLIHelpVersionAndInvalidCommandsHaveNoSaveSideEffects(t *testing.T) {
 		wantError bool
 		want      string
 	}{
-		{[]string{"-data", path, "help"}, false, "catch <pokemon>"},
+		{[]string{"-data", path, "help"}, false, "catch <wildling>"},
 		{[]string{"-data", path, "-version"}, false, "clibble dev"},
 		{[]string{"-data", path, "what"}, true, ""},
 		{[]string{"-data", path, "catch"}, true, ""},
@@ -68,7 +68,7 @@ func TestCLIEphemeralAndAutomaticDirectory(t *testing.T) {
 	if err := runCLI(context.Background(), []string{"-ephemeral", "pokedex"}, strings.NewReader(""), &out, &errOut, false); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), "No Pokemon caught yet") {
+	if !strings.Contains(out.String(), "No wildling caught yet") {
 		t.Fatal(out.String())
 	}
 }
@@ -110,14 +110,14 @@ func TestCLICountUsesSavedCollectionOffline(t *testing.T) {
 	if err := runCLI(context.Background(), []string{"-data", path, "count"}, strings.NewReader(""), &out, &errOut, false); err != nil {
 		t.Fatal(err)
 	}
-	if out.String() != "Caught Pokemon: 2\n" {
+	if out.String() != "Befriended wildlings: 2\n" {
 		t.Fatal(out.String())
 	}
 	out.Reset()
 	if err := runCLI(context.Background(), []string{"-ephemeral", "count"}, strings.NewReader(""), &out, &errOut, false); err != nil {
 		t.Fatal(err)
 	}
-	if out.String() != "Caught Pokemon: 0\n" {
+	if out.String() != "Befriended wildlings: 0\n" {
 		t.Fatal(out.String())
 	}
 }

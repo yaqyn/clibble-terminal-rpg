@@ -49,10 +49,10 @@ func loadGame(path string) (map[string]pokeapi.Pokemon, gameProgress, error) {
 	}
 	for name, p := range saved.Pokemon {
 		if name != p.Name {
-			return nil, gameProgress{}, fmt.Errorf("save key does not match Pokemon name")
+			return nil, gameProgress{}, fmt.Errorf("save key does not match wildling name")
 		}
 		if err := pokeapi.ValidatePokemon(p); err != nil {
-			return nil, gameProgress{}, fmt.Errorf("invalid saved Pokemon: %w", err)
+			return nil, gameProgress{}, fmt.Errorf("invalid saved wildling: %w", err)
 		}
 	}
 	progress := freshProgress(time.Now())

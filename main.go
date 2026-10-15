@@ -16,7 +16,7 @@ import (
 
 	"github.com/yaqyn/clibble-pokemon-cli/internal/brand"
 	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
-	"github.com/yaqyn/clibble-pokemon-cli/internal/pokecache"
+
 	"golang.org/x/term"
 )
 
@@ -110,14 +110,8 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 			return err
 		}
 	}
-	client, err := pokeapi.NewClient(pokeapi.BaseURL, *timeout)
-	if err != nil {
-		return err
-	}
-	cache := pokecache.NewCache(5 * time.Minute)
-	defer cache.Close()
-	client.SetCache(cache)
-	cfg.client = client
+	_ = timeout // Retained for older scripts; the bundled world performs no network requests.
+	cfg.client = meadowWorld{}
 	if !*ephemeral {
 		path, err := collectionPath(*dataPath)
 		if err != nil {

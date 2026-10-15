@@ -34,7 +34,7 @@ func (v *terminalView) welcome(count int, persistent bool) {
 		mode = "Collection saved automatically"
 	}
 	fmt.Fprintf(v.out, "\n%d caught · %s\n", count, mode)
-	fmt.Fprintln(v.out, "Start with map, catch pidgey, or collection.")
+	fmt.Fprintln(v.out, "Start with map, catch mosskin, or collection.")
 	if v.editing {
 		fmt.Fprintln(v.out, "Tab completes commands. Up/down recalls this session.")
 	}
@@ -46,8 +46,8 @@ func (v *terminalView) help() {
 		title    string
 		commands [][2]string
 	}{
-		{"Explore", [][2]string{{"map", "Next 20 areas"}, {"mapb", "Previous areas"}, {"explore <area>", "Find Pokemon in an area"}}},
-		{"Collect", [][2]string{{"catch <pokemon>", "Attempt a catch"}, {"collection", "Browse your caught Pokemon"}, {"count", "Count caught Pokemon offline"}, {"inspect <pokemon>", "Read a creature's field record"}}},
+		{"Explore", [][2]string{{"map", "Browse the trails"}, {"mapb", "Previous areas"}, {"explore <area>", "Find wildling in an area"}}},
+		{"Collect", [][2]string{{"catch <wildling>", "Attempt a catch"}, {"collection", "Browse your caught wildling"}, {"count", "Count caught wildling offline"}, {"inspect <wildling>", "Read a creature's field record"}}},
 		{"Session", [][2]string{{"help", "Show this field guide"}, {"exit", "Leave Clibble"}}},
 	} {
 		fmt.Fprintf(v.out, "\n%s\n", v.accent(group.title))
@@ -59,7 +59,7 @@ func (v *terminalView) help() {
 			}
 		}
 	}
-	fmt.Fprintln(v.out, "\nBrowse saved records in a browser: clibble serve\nThe pokedex command remains an alias for collection.")
+	fmt.Fprintln(v.out, "\nBrowse saved records in a browser: clibble serve\nYour journal is saved automatically.")
 }
 func (v *terminalView) inspect(p pokeapi.Pokemon) {
 	v.title(p.Name)
@@ -68,10 +68,10 @@ func (v *terminalView) inspect(p pokeapi.Pokemon) {
 		types = append(types, kind.Type.Name)
 	}
 	if len(types) > 0 {
-		fmt.Fprintf(v.out, "Type     %s\n", strings.Join(types, " / "))
+		fmt.Fprintf(v.out, "Habitat  %s\n", strings.Join(types, " / "))
 	}
 	fmt.Fprintf(v.out, "Height   %.1f m\nWeight   %.1f kg\n", float64(p.Height)/10, float64(p.Weight)/10)
-	v.title("Base stats")
+	v.title("Traits")
 	for _, stat := range p.Stats {
 		if v.width < 60 {
 			fmt.Fprintf(v.out, "  %s: %d\n", stat.Stat.Name, stat.BaseStat)
@@ -88,7 +88,7 @@ func (v *terminalView) inspect(p pokeapi.Pokemon) {
 func (v *terminalView) collection(pokemon map[string]pokeapi.Pokemon) {
 	v.title("Your collection")
 	if len(pokemon) == 0 {
-		fmt.Fprintln(v.out, "No Pokemon caught yet. Try catch pidgey.")
+		fmt.Fprintln(v.out, "No wildling caught yet. Try catch mosskin.")
 		return
 	}
 	fmt.Fprintf(v.out, "%d caught\n\n", len(pokemon))
@@ -104,7 +104,7 @@ func (v *terminalView) collection(pokemon map[string]pokeapi.Pokemon) {
 			fmt.Fprintf(v.out, "  %-24s %s\n", name, strings.Join(types, " / "))
 		}
 	}
-	fmt.Fprintln(v.out, "\nUse inspect <pokemon> to open a record.")
+	fmt.Fprintln(v.out, "\nUse inspect <wildling> to open a record.")
 }
 
 func (v *terminalView) locations(areas []pokeapi.Resource) {

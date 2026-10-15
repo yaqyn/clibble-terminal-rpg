@@ -26,7 +26,7 @@ const node = (tag, className, text) => {
 };
 const types = (pokemon) =>
   (pokemon.types || []).map((entry) => entry.type.name);
-function visiblePokemon() {
+function visiblewildling() {
   const query = ui.search.value.trim().toLowerCase();
   return state.pokemon.filter(
     (pokemon) =>
@@ -67,7 +67,7 @@ function renderDetail(pokemon) {
     measurements.append(pair);
   }
   const stats = node("div", "stats");
-  stats.append(node("h3", "stats-title", "Base stats"));
+  stats.append(node("h3", "stats-title", "Traits"));
   for (const entry of pokemon.stats || []) {
     const row = node("div", "stat");
     const label = entry.stat.name.replaceAll("-", " ");
@@ -94,7 +94,7 @@ function renderDetail(pokemon) {
   );
 }
 function renderList() {
-  const matches = visiblePokemon();
+  const matches = visiblewildling();
   const visible = matches.slice(0, state.limit);
   ui.more.hidden = visible.length >= matches.length;
   ui.more.disabled = ui.more.hidden;
@@ -112,7 +112,7 @@ function renderList() {
       ? "A new trail starts here."
       : "No matching records.";
     byId("empty-copy").textContent = isEmpty
-      ? "Catch your first Pokemon in the terminal, then refresh this page."
+      ? "Catch your first wildling in the terminal, then refresh this page."
       : "Try another name or type, or clear the search.";
     ui.empty.querySelector("code").hidden = !isEmpty;
     const placeholder = node("div", "record-placeholder");
@@ -120,7 +120,7 @@ function renderList() {
     heading.id = "record-title";
     placeholder.append(
       heading,
-      node("p", "", "Choose a Pokemon to open its field record."),
+      node("p", "", "Choose a wildling to open its field record."),
     );
     ui.detail.replaceChildren(placeholder);
     state.selected = null;

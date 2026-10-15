@@ -54,12 +54,12 @@ func getCommands() map[string]cliCommand {
 		"exit":       {"exit", "Leave Clibble", 0, commandExit},
 		"map":        {"map", "Display the next 20 location areas", 0, commandMap},
 		"mapb":       {"mapb", "Display the previous 20 location areas", 0, commandMapBack},
-		"explore":    {"explore <area>", "List Pokemon in a location area", 1, commandExplore},
-		"catch":      {"catch <pokemon>", "Attempt to catch a Pokemon", 1, commandCatch},
-		"inspect":    {"inspect <pokemon>", "Show a caught Pokemon's details", 1, commandInspect},
-		"collection": {"collection", "List your caught Pokemon", 0, commandPokedex},
+		"explore":    {"explore <area>", "List wildling in a location area", 1, commandExplore},
+		"catch":      {"catch <wildling>", "Attempt to catch a wildling", 1, commandCatch},
+		"inspect":    {"inspect <wildling>", "Show a caught wildling's details", 1, commandInspect},
+		"collection": {"collection", "List your caught wildling", 0, commandPokedex},
 		"pokedex":    {"pokedex", "Alias for collection", 0, commandPokedex},
-		"count":      {"count", "Show the number of caught Pokemon", 0, commandCount},
+		"count":      {"count", "Show the number of caught wildling", 0, commandCount},
 	}
 }
 func commandExit(cfg *config, args ...string) error {
@@ -122,7 +122,7 @@ func commandExplore(cfg *config, args ...string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(cfg.out, "Found Pokemon:")
+	fmt.Fprintln(cfg.out, "Found wildling:")
 	for _, encounter := range area.PokemonEncounters {
 		fmt.Fprintf(cfg.out, " - %s\n", encounter.Pokemon.Name)
 	}
@@ -139,7 +139,7 @@ func commandCatch(cfg *config, args ...string) error {
 		fmt.Fprintf(cfg.out, "%s is already in your collection.\n", args[0])
 		return nil
 	}
-	fmt.Fprintf(cfg.out, "Throwing a Pokeball at %s...\n", args[0])
+	fmt.Fprintf(cfg.out, "Throwing a catch seed at %s...\n", args[0])
 	result, err := attemptCatch(cfg.ctx, cfg.client, cfg.pokedex, cfg.random, cfg.persist, cfg.progress, cfg.now(), args[0])
 	if err != nil {
 		return err
@@ -149,19 +149,19 @@ func commandCatch(cfg *config, args ...string) error {
 		return nil
 	}
 	cfg.progress = result.progress
-	fmt.Fprintf(cfg.out, "Pokeballs: %d/%d; tries left: %d/3\n", cfg.progress.Balls, ballCapacity, 3-cfg.progress.Encounters[result.pokemon.Name].Throws)
+	fmt.Fprintf(cfg.out, "Catch seeds: %d/%d; tries left: %d/3\n", cfg.progress.Balls, ballCapacity, 3-cfg.progress.Encounters[result.pokemon.Name].Throws)
 	if !result.caught {
 		fmt.Fprintf(cfg.out, "%s escaped!\n", result.pokemon.Name)
 		return nil
 	}
 	cfg.pokedex = result.owned
-	fmt.Fprintf(cfg.out, "%s was caught!\nOpen its record with inspect <pokemon>.\n", result.pokemon.Name)
+	fmt.Fprintf(cfg.out, "%s was caught!\nOpen its record with inspect <wildling>.\n", result.pokemon.Name)
 	return nil
 }
 func commandInspect(cfg *config, args ...string) error {
 	pokemon, ok := cfg.pokedex[args[0]]
 	if !ok {
-		return fmt.Errorf("you have not caught that pokemon; try catch %s first", args[0])
+		return fmt.Errorf("you have not caught that wildling; try catch %s first", args[0])
 	}
 	if cfg.view != nil {
 		cfg.view.inspect(pokemon)
@@ -187,13 +187,13 @@ func commandPokedex(cfg *config, args ...string) error {
 		fmt.Fprintf(cfg.out, " - %s\n", name)
 	}
 	if len(cfg.pokedex) == 0 {
-		fmt.Fprintln(cfg.out, "No Pokemon caught yet. Try catch <pokemon>.")
+		fmt.Fprintln(cfg.out, "No wildling caught yet. Try catch <wildling>.")
 	}
 	return nil
 }
 func validName(name string) bool { return pokeapi.ValidName(name) }
 
 func commandCount(cfg *config, args ...string) error {
-	_, err := fmt.Fprintf(cfg.out, "Caught Pokemon: %d\n", len(cfg.pokedex))
+	_, err := fmt.Fprintf(cfg.out, "Befriended wildlings: %d\n", len(cfg.pokedex))
 	return err
 }

@@ -54,7 +54,7 @@ func (p gameProgress) allowance(name string, now time.Time) error {
 		return fmt.Errorf("%s needs a rest; try again in %s", placeName(name), e.Until.Sub(now).Round(time.Second))
 	}
 	if p.Balls == 0 {
-		return fmt.Errorf("your pouch is empty; your next Pokeball arrives in %s", p.RefillAt.Add(ballInterval).Sub(now).Round(time.Second))
+		return fmt.Errorf("your pouch is empty; your next catch seed arrives in %s", p.RefillAt.Add(ballInterval).Sub(now).Round(time.Second))
 	}
 	return nil
 }
