@@ -31,7 +31,7 @@ func main() {
 func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	interactive := term.IsTerminal(int(os.Stdin.Fd()))
+	interactive := term.IsTerminal(int(os.Stdin.Fd())) && term.IsTerminal(int(os.Stdout.Fd()))
 	return runCLI(ctx, os.Args[1:], os.Stdin, os.Stdout, os.Stderr, interactive)
 }
 func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Writer, interactive bool) error {

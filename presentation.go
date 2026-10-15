@@ -10,9 +10,10 @@ import (
 )
 
 type terminalView struct {
-	out   io.Writer
-	color bool
-	width int
+	editing bool
+	out     io.Writer
+	color   bool
+	width   int
 }
 
 func (v *terminalView) accent(text string) string {
@@ -33,7 +34,11 @@ func (v *terminalView) welcome(count int, persistent bool) {
 		mode = "Collection saved automatically"
 	}
 	fmt.Fprintf(v.out, "\n%d caught · %s\n", count, mode)
-	fmt.Fprintln(v.out, "Start with map, catch pidgey, or collection.\nTab completes commands. Up/down recalls this session.\nUse help for commands; exit or Ctrl+C to leave.")
+	fmt.Fprintln(v.out, "Start with map, catch pidgey, or collection.")
+	if v.editing {
+		fmt.Fprintln(v.out, "Tab completes commands. Up/down recalls this session.")
+	}
+	fmt.Fprintln(v.out, "Use help for commands; exit or Ctrl+C to leave.")
 }
 func (v *terminalView) help() {
 	v.title("Dexrove field guide")

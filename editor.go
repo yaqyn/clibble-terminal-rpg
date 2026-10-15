@@ -47,6 +47,7 @@ func enableEditor(cfg *config, in io.Reader, out io.Writer) (func(), error) {
 		replacement, cursor, ok := completeCommand(commands, line, pos, key)
 		return replacement, cursor, ok
 	}
+	cfg.view.editing = true
 	cfg.readLine = editor.ReadLine
 	cfg.prompt = false
 	cfg.out = editor
