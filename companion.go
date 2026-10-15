@@ -89,7 +89,7 @@ func serveCompanion(ctx context.Context, path string, port int, out io.Writer) e
 	server := &http.Server{Handler: companionHandler(path, listener.Addr().String()), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, WriteTimeout: 10 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 8 << 10}
 	result := make(chan error, 1)
 	go func() { result <- server.Serve(listener) }()
-	fmt.Fprintf(out, "Clibble companion\nOpen http://%s\nRead-only collection view. Catch wildling in the CLI, then refresh here.\nPress Ctrl+C to stop.\n", listener.Addr())
+	fmt.Fprintf(out, "Clibble companion\nOpen http://%s\nRead-only collection view. Catch wildlings in the CLI, then refresh here.\nPress Ctrl+C to stop.\n", listener.Addr())
 	select {
 	case <-ctx.Done():
 		shutdown, cancel := context.WithTimeout(context.Background(), 5*time.Second)

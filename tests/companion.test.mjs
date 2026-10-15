@@ -77,7 +77,7 @@ test("empty state provides a real next action", async () => {
   assert.equal(app.document.querySelector("#empty").hidden, false);
   assert.match(
     app.document.querySelector("#empty code").textContent,
-    /clibble catch pidgey/,
+    /clibble catch mosskin/,
   );
   assert.equal(app.document.querySelector("#search").disabled, true);
   app.dom.window.close();

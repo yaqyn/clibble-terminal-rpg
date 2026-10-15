@@ -113,7 +113,7 @@ function renderList() {
       : "No matching records.";
     byId("empty-copy").textContent = isEmpty
       ? "Catch your first wildling in the terminal, then refresh this page."
-      : "Try another name or type, or clear the search.";
+      : "Try another name or habitat, or clear the search.";
     ui.empty.querySelector("code").hidden = !isEmpty;
     const placeholder = node("div", "record-placeholder");
     const heading = node("h2", "", "A closer look.");
