@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/yaqyn/clibble/internal/pokeapi"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 )
 
 type catchResult struct {

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yaqyn/clibble/internal/pokeapi"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 )
 
 func TestLegacyCollectionIsReused(t *testing.T) {

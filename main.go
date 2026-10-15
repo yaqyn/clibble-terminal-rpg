@@ -14,9 +14,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/yaqyn/clibble/internal/brand"
-	"github.com/yaqyn/clibble/internal/pokeapi"
-	"github.com/yaqyn/clibble/internal/pokecache"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/brand"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/pokecache"
 	"golang.org/x/term"
 )
 

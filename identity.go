@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/yaqyn/clibble/internal/brand"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/brand"
 )
 
 // defaultCollection preserves the existing collection and its original lock.

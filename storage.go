@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/yaqyn/clibble/internal/pokeapi"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 )
 
 const maxSaveBytes = 4 << 20

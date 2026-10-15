@@ -1,14 +1,14 @@
 ![Clibble — A little wild in your terminal.](readme-assets/cover.webp)
 
-# Clibble — A little wild in your terminal
+# Clibble — a terminal Pokémon adventure
 
-Explore Pokemon locations, catch what you find, and build a collection worth coming back to.
-Clibble is a terminal-first Pokemon catching adventure: discover locations, build a collection,
-and read creature records without leaving your shell. An optional local browser view
-complements the CLI when you want to browse saved records visually.
-Your collection stays on your device. No account, API key, or subscription.
+Explore Pokémon locations, try your luck at a catch, and keep a collection on your device.
 
-[Download the CLI](https://github.com/yaqyn/clibble/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
+Clibble brings an arrow-driven adventure to your terminal. Travel between locations,
+inspect your catches offline, or browse saved records in the optional, read-only web companion.
+Exploration uses PokéAPI; saved catches stay local and require no account or API key.
+
+[Download the CLI](https://github.com/yaqyn/clibble-pokemon-cli/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
 
 ## <img src="readme-assets/icons/features.svg" width="24" height="24" alt=""> Features
 
@@ -16,12 +16,12 @@ Your collection stays on your device. No account, API key, or subscription.
 - **Follow a new trail.** Browse location areas and discover the Pokemon that live there.
 - **Make the catch.** Try your luck, save successful catches, and return to their records offline.
 - **See your collection.** Search by name or type in the read-only web companion; compare stats and measurements.
-- **Keep control.** Local saves, single-writer locks, bounded requests, and plain script output protect the useful parts of a small tool.
+- **Use it your way.** Run one-shot commands or pipe a batch; local saves keep your collection between sessions.
 
 ## <img src="readme-assets/icons/installation.svg" width="24" height="24" alt=""> Installation
 
 Download the archive for your operating system and architecture from the
-[releases page](https://github.com/yaqyn/clibble/releases/latest), verify it against
+[releases page](https://github.com/yaqyn/clibble-pokemon-cli/releases/latest), verify it against
 `SHA256SUMS`, and extract it. Run `clibble` on Linux/macOS or `clibble.exe` on Windows.
 The compiled app includes the web interface and font; it needs no Go, Node, or Python runtime.
 New exploration and catch data require internet access to PokéAPI.
@@ -29,8 +29,8 @@ New exploration and catch data require internet access to PokéAPI.
 To build from source, install the Go version declared in [go.mod](go.mod) or newer:
 
 ```bash
-git clone https://github.com/yaqyn/clibble.git
-cd clibble
+git clone https://github.com/yaqyn/clibble-pokemon-cli.git
+cd clibble-pokemon-cli
 go build -trimpath -o clibble .
 ```
 
@@ -151,7 +151,7 @@ Tests cover RPG navigation, cancellation, stale results, shutdown during saves,
 small-screen layouts, catch/escape outcomes, pagination, cached requests, malformed responses,
 timeouts, save recovery and locking, legacy-save discovery, plain CLI output,
 local web API boundaries, search, selection, empty states, and refresh failures.
-[CI](https://github.com/yaqyn/clibble/actions/workflows/ci.yml) runs native Go checks
+[CI](https://github.com/yaqyn/clibble-pokemon-cli/actions/workflows/ci.yml) runs native Go checks
 on Linux, macOS, and Windows. See [release preparation](docs/RELEASE.md) for packaging.
 
 ## <img src="readme-assets/icons/security.svg" width="24" height="24" alt=""> Security and limitations

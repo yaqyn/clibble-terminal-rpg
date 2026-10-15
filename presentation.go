@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/yaqyn/clibble/internal/brand"
-	"github.com/yaqyn/clibble/internal/pokeapi"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/brand"
+	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 )
 
 type terminalView struct {
