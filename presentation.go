@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/yaqyn/dexrove/internal/brand"
-	"github.com/yaqyn/dexrove/internal/pokeapi"
+	"github.com/yaqyn/clibble/internal/brand"
+	"github.com/yaqyn/clibble/internal/pokeapi"
 )
 
 type terminalView struct {
@@ -41,14 +41,14 @@ func (v *terminalView) welcome(count int, persistent bool) {
 	fmt.Fprintln(v.out, "Use help for commands; exit or Ctrl+C to leave.")
 }
 func (v *terminalView) help() {
-	v.title("Dexrove field guide")
+	v.title("Clibble field guide")
 	for _, group := range []struct {
 		title    string
 		commands [][2]string
 	}{
 		{"Explore", [][2]string{{"map", "Next 20 areas"}, {"mapb", "Previous areas"}, {"explore <area>", "Find Pokemon in an area"}}},
 		{"Collect", [][2]string{{"catch <pokemon>", "Attempt a catch"}, {"collection", "Browse your caught Pokemon"}, {"count", "Count caught Pokemon offline"}, {"inspect <pokemon>", "Read a creature's field record"}}},
-		{"Session", [][2]string{{"help", "Show this field guide"}, {"exit", "Leave Dexrove"}}},
+		{"Session", [][2]string{{"help", "Show this field guide"}, {"exit", "Leave Clibble"}}},
 	} {
 		fmt.Fprintf(v.out, "\n%s\n", v.accent(group.title))
 		for _, cmd := range group.commands {
@@ -59,7 +59,7 @@ func (v *terminalView) help() {
 			}
 		}
 	}
-	fmt.Fprintln(v.out, "\nBrowse saved records in a browser: dexrove serve\nThe pokedex command remains an alias for collection.")
+	fmt.Fprintln(v.out, "\nBrowse saved records in a browser: clibble serve\nThe pokedex command remains an alias for collection.")
 }
 func (v *terminalView) inspect(p pokeapi.Pokemon) {
 	v.title(p.Name)

@@ -14,9 +14,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/yaqyn/dexrove/internal/brand"
-	"github.com/yaqyn/dexrove/internal/pokeapi"
-	"github.com/yaqyn/dexrove/internal/pokecache"
+	"github.com/yaqyn/clibble/internal/brand"
+	"github.com/yaqyn/clibble/internal/pokeapi"
+	"github.com/yaqyn/clibble/internal/pokecache"
 	"golang.org/x/term"
 )
 
@@ -40,11 +40,11 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 	port := flags.Int("port", 8787, "Local web companion port (serve only)")
 	colorMode := flags.String("color", "auto", "Terminal color: auto, always, or never")
 	showVersion := flags.Bool("version", false, "Print the build version")
-	dataPath := flags.String("data", "", "JSON save path (default: user configuration directory/dexrove/collection.json)")
+	dataPath := flags.String("data", "", "JSON save path (default: user configuration directory/clibble/collection.json)")
 	ephemeral := flags.Bool("ephemeral", false, "Use a temporary collection without loading or writing saves")
 	timeout := flags.Duration("timeout", 10*time.Second, "Maximum duration of each API request")
 	flags.Usage = func() {
-		fmt.Fprintln(errOut, "Usage: dexrove [flags] [command [argument]]\n\nStart an interactive session or run one command. Use 'dexrove help' for commands.\n\nFlags:")
+		fmt.Fprintln(errOut, "Usage: clibble [flags] [command [argument]]\n\nStart an interactive session or run one command. Use 'clibble help' for commands.\n\nFlags:")
 		flags.PrintDefaults()
 	}
 	if err := flags.Parse(args); errors.Is(err, flag.ErrHelp) {
@@ -83,7 +83,7 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 	}
 	if len(words) > 0 && words[0] == "serve" {
 		if len(words) != 1 {
-			return fmt.Errorf("Usage: dexrove [flags] serve")
+			return fmt.Errorf("Usage: clibble [flags] serve")
 		}
 		if *ephemeral {
 			return fmt.Errorf("serve reads saved collections; omit -ephemeral")

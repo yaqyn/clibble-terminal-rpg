@@ -7,7 +7,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/yaqyn/dexrove/internal/pokeapi"
+	"github.com/yaqyn/clibble/internal/pokeapi"
 )
 
 var errExit = errors.New("exit requested")
@@ -45,7 +45,7 @@ type config struct {
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help":       {"help", "Displays a help message", 0, commandHelp},
-		"exit":       {"exit", "Leave Dexrove", 0, commandExit},
+		"exit":       {"exit", "Leave Clibble", 0, commandExit},
 		"map":        {"map", "Display the next 20 location areas", 0, commandMap},
 		"mapb":       {"mapb", "Display the previous 20 location areas", 0, commandMapBack},
 		"explore":    {"explore <area>", "List Pokemon in a location area", 1, commandExplore},
@@ -57,7 +57,7 @@ func getCommands() map[string]cliCommand {
 	}
 }
 func commandExit(cfg *config, args ...string) error {
-	fmt.Fprintln(cfg.out, "Leaving Dexrove. See you on the next trail.")
+	fmt.Fprintln(cfg.out, "Leaving Clibble. See you on the next trail.")
 	return errExit
 }
 func commandHelp(cfg *config, args ...string) error {
@@ -65,12 +65,12 @@ func commandHelp(cfg *config, args ...string) error {
 		cfg.view.help()
 		return nil
 	}
-	fmt.Fprint(cfg.out, "Dexrove — Explore. Catch. Keep.\nUsage:\n\n")
+	fmt.Fprint(cfg.out, "Clibble — A little wild in your terminal.\nUsage:\n\n")
 	for _, key := range sortedKeys(cfg.commands) {
 		cmd := cfg.commands[key]
 		fmt.Fprintf(cfg.out, "%s: %s\n", cmd.name, cmd.description)
 	}
-	fmt.Fprintln(cfg.out, "\nserve: Open the local collection companion (dexrove serve)")
+	fmt.Fprintln(cfg.out, "\nserve: Open the local collection companion (clibble serve)")
 	return nil
 }
 func sortedKeys[V any](values map[string]V) []string {

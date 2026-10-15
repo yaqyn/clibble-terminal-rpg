@@ -1,7 +1,7 @@
-# Using Dexrove
+# Using Clibble
 
-Dexrove is an independent Pokemon field guide. Start `dexrove` for the interactive
-CLI, run `dexrove <command>` for a single operation, or `dexrove serve` to browse a
+Clibble is an independent Pokemon field guide. Start `clibble` for the interactive
+CLI, run `clibble <command>` for a single operation, or `clibble serve` to browse a
 saved collection in your browser.
 
 ## Finding and catching Pokemon
@@ -18,7 +18,7 @@ metres/kilograms. Plain CLI output keeps PokéAPI's original decimetres/hectogra
 ## The local companion
 
 ```bash
-dexrove serve
+clibble serve
 ```
 
 Open the printed address (normally http://127.0.0.1:8787). The interface searches
@@ -33,8 +33,8 @@ Use Ctrl+C in its terminal to stop the local server. There is no network binding
 option: this interface is not designed for public or shared hosting.
 
 ```bash
-dexrove -port 9000 serve
-dexrove -data ./collections/first.json serve
+clibble -port 9000 serve
+clibble -data ./collections/first.json serve
 ```
 
 A missing collection shows an empty state; a corrupt save produces an actionable
@@ -44,9 +44,9 @@ error. The web view never returns the save path or detailed filesystem errors.
 
 New collections use:
 
-- Linux: `$XDG_CONFIG_HOME/dexrove/collection.json`, or `~/.config/dexrove/collection.json`.
-- macOS: `~/Library/Application Support/dexrove/collection.json`.
-- Windows: `%AppData%\dexrove\collection.json`.
+- Linux: `$XDG_CONFIG_HOME/clibble/collection.json`, or `~/.config/clibble/collection.json`.
+- macOS: `~/Library/Application Support/clibble/collection.json`.
+- Windows: `%AppData%\clibble\collection.json`.
 
 `-data` selects another file; parent directories are created automatically by the
 CLI. `-ephemeral` starts a temporary CLI collection, and cannot be combined with
@@ -55,16 +55,17 @@ uses the current user's filesystem controls.
 
 ## Save compatibility
 
-Dexrove retains the version-1 JSON collection format. If the new default file does
-not exist but an old `pokedex/pokedex.json` exists under the same platform config
-directory, Dexrove continues to use that file and its original lock. Nothing is
-moved or overwritten during discovery. An existing Dexrove collection takes priority.
+Clibble retains the version-1 JSON collection format. It looks under the platform
+configuration directory in this order: `clibble/collection.json`, then the previous
+`dexrove/collection.json`, then `pokedex/pokedex.json`. The first existing file is
+used with its original lock. Nothing is moved, merged, or overwritten during
+discovery. Both prior executable names were renamed; existing saves still work.
 Both CLI and companion resolve the same path.
 
 To change the location deliberately, close CLI writers, back up the old JSON, copy
 it to the desired location, and use `-data` with both CLI and companion. The old
-`pokedex` command remains a collection alias. The old executable name has changed
-to `dexrove`; the v1.0.0 release remains available as historical software.
+`pokedex` command remains a collection alias. The executable is now `clibble`; v1.0.0 (Pokedex) and v1.1.0 (Dexrove) remain
+available as historical software.
 
 ## Terminal and scripts
 
@@ -78,10 +79,10 @@ Its last 100 commands stay in memory only. Terminal settings are restored on exi
 `always` option is only for interactive presentation; redirected results stay plain.
 
 ```bash
-dexrove -color never
-dexrove -timeout 5s catch pidgey
-dexrove -data ./collection.json inspect pidgey
-printf 'collection\nexit\n' | dexrove
+clibble -color never
+clibble -timeout 5s catch pidgey
+clibble -data ./collection.json inspect pidgey
+printf 'collection\nexit\n' | clibble
 ```
 
 Shell flags precede the command. One-shot failures return status 1. Batches keep
@@ -91,7 +92,7 @@ leave the prompt usable. An escaped catch returns success because the attempt ra
 ## Recovery
 
 - **Save already in use:** another CLI writer owns that collection. Close it or choose another `-data` file. The browser companion can remain open.
-- **Invalid save:** preserve the file and restore a backup or correct its JSON. Dexrove refuses to reset a malformed collection silently.
+- **Invalid save:** preserve the file and restore a backup or correct its JSON. Clibble refuses to reset a malformed collection silently.
 - **HTTP 404:** check the Pokemon or area identifier. Names use letters, digits, and hyphens.
 - **Request timeout:** retry later or increase `-timeout`. Map pagination stays unchanged after failures.
 - **Port in use:** choose another `-port`. The companion still binds only to 127.0.0.1.

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yaqyn/dexrove/internal/pokeapi"
+	"github.com/yaqyn/clibble/internal/pokeapi"
 )
 
 func TestCompanionReadsCollectionAndServesEmbeddedAssets(t *testing.T) {

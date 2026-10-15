@@ -1,4 +1,4 @@
-module github.com/yaqyn/dexrove
+module github.com/yaqyn/clibble
 
 go 1.27.2
 

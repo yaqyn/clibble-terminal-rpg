@@ -17,7 +17,7 @@ func lockSave(path string) (func(), error) {
 	}
 	if !locked {
 		_ = lock.Close()
-		return nil, fmt.Errorf("save is already in use by another Dexrove session")
+		return nil, fmt.Errorf("save is already in use by another Clibble session")
 	}
 	return func() { _ = lock.Close() }, nil
 }

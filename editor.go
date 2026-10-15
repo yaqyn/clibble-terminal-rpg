@@ -30,7 +30,7 @@ func enableEditor(cfg *config, in io.Reader, out io.Writer) (func(), error) {
 	}
 	ctx, cancel := context.WithCancel(cfg.ctx)
 	cfg.ctx = ctx
-	editor := term.NewTerminal(terminalIO{input, output}, cfg.view.accent("dexrove")+" > ")
+	editor := term.NewTerminal(terminalIO{input, output}, cfg.view.accent("clibble")+" > ")
 	if width, height, err := term.GetSize(int(output.Fd())); err == nil {
 		_ = editor.SetSize(width, height)
 	}

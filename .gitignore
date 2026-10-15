@@ -10,6 +10,9 @@
 
 __pycache__/
 
+/clibble
+/clibble.exe
+/node_modules/
+
 /dexrove
 /dexrove.exe
-/node_modules/

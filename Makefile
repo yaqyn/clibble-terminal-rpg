@@ -7,7 +7,7 @@ ui-test:
 	npm test
 
 build:
-	go build -trimpath -o dexrove .
+	go build -trimpath -o clibble .
 
 test:
 	go test -race ./...

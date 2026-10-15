@@ -2,10 +2,10 @@
 
 ## Brand
 
-- **Name:** Dexrove.
+- **Name:** Clibble.
 - **Category:** Independent Pokemon field guide and collection app.
 - **Description:** Explore Pokemon locations, catch creatures, and keep a collection from your terminal; browse saved creatures in a local web view.
-- **Stage:** Released CLI, being redesigned under the Dexrove identity.
+- **Stage:** Released CLI, being redesigned under the Clibble identity.
 - **Owner:** Abdulrahman M. Yaqyn.
 
 ## Audience
@@ -23,8 +23,8 @@
 ## Personality and voice
 
 Curious, precise, approachable, composed. Use clear actions and brief recovery hints.
-Dexrove combines the familiar “dex” with “rove,” connecting collection and exploration.
-The tagline is “Explore. Catch. Keep.” Avoid technical internals in user-facing status.
+Clibble combines the familiar “dex” with “rove,” connecting collection and exploration.
+The tagline is “A little wild in your terminal.” Avoid technical internals in user-facing status.
 
 ## Values and mission
 

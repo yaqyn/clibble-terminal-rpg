@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yaqyn/dexrove/internal/pokeapi"
+	"github.com/yaqyn/clibble/internal/pokeapi"
 )
 
 func TestSaveRoundTripAndPermissions(t *testing.T) {

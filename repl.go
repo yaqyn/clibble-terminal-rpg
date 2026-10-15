@@ -102,7 +102,7 @@ func runREPL(cfg *config, in io.Reader) error {
 			return err
 		}
 		if cfg.prompt {
-			if _, err := fmt.Fprint(cfg.out, "dexrove > "); err != nil {
+			if _, err := fmt.Fprint(cfg.out, "clibble > "); err != nil {
 				return err
 			}
 		}

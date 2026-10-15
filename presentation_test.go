@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/yaqyn/dexrove/internal/pokeapi"
+	"github.com/yaqyn/clibble/internal/pokeapi"
 )
 
 func TestLegacyCollectionIsReused(t *testing.T) {
@@ -24,9 +24,24 @@ func TestLegacyCollectionIsReused(t *testing.T) {
 	if err != nil || selected != legacy {
 		t.Fatalf("selected %s: %v", selected, err)
 	}
-	current := filepath.Join(dir, "dexrove", "collection.json")
-	os.MkdirAll(filepath.Dir(current), 0700)
-	savePokedex(current, map[string]pokeapi.Pokemon{})
+	previous := filepath.Join(dir, "dexrove", "collection.json")
+	if err := os.MkdirAll(filepath.Dir(previous), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := savePokedex(previous, map[string]pokeapi.Pokemon{"pidgey": {Name: "pidgey"}}); err != nil {
+		t.Fatal(err)
+	}
+	selected, err = defaultCollection(dir)
+	if err != nil || selected != previous {
+		t.Fatalf("Dexrove collection should take priority over Pokedex: %s: %v", selected, err)
+	}
+	current := filepath.Join(dir, "clibble", "collection.json")
+	if err := os.MkdirAll(filepath.Dir(current), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := savePokedex(current, map[string]pokeapi.Pokemon{}); err != nil {
+		t.Fatal(err)
+	}
 	selected, err = defaultCollection(dir)
 	if err != nil || selected != current {
 		t.Fatalf("new collection should take priority: %v", err)
@@ -53,7 +68,7 @@ func TestPipesStayPlainEvenWhenColorRequested(t *testing.T) {
 	if err := runCLI(context.Background(), []string{"-ephemeral", "-color", "always", "collection"}, strings.NewReader(""), &out, &errOut, false); err != nil {
 		t.Fatal(err)
 	}
-	if strings.Contains(out.String(), "\x1b[") || strings.Contains(out.String(), "dexrove >") {
+	if strings.Contains(out.String(), "\x1b[") || strings.Contains(out.String(), "clibble >") {
 		t.Fatal("script output has terminal presentation")
 	}
 	if !strings.Contains(out.String(), "Your collection:") {

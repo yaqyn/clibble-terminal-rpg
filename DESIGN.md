@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: Dexrove
+name: Clibble
 description: A Pokemon field guide shaped by exploration, clear records, and local ownership.
 colors:
   primary: "#315dcd"
@@ -33,7 +33,7 @@ components:
     textColor: "{colors.terminal-accent}"
 ---
 
-# Dexrove design system
+# Clibble design system
 
 ## Creative direction
 
@@ -43,7 +43,7 @@ The terminal is the primary product; the read-only browser view is a complement.
 The interface supports that motif with calm cobalt and mist surfaces, rather
 than reproducing a game console or turning the app into a dashboard of metrics.
 
-Dexrove means dex + rove. “Explore. Catch. Keep.” gives the three actions equal
+Clibble means dex + rove. “A little wild in your terminal.” gives the three actions equal
 weight. The audience is terminal-comfortable Pokemon fans; the web companion
 makes saved records easier to browse. English is the supported interface language;
 this is not a Japan-market product merely because its data comes from Pokemon.

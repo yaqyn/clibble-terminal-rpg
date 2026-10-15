@@ -24,15 +24,15 @@ def main():
     checksums = []
     for target_os in ("linux", "darwin", "windows"):
         for arch in ("amd64", "arm64"):
-            with tempfile.TemporaryDirectory(prefix="dexrove-release-") as temporary:
-                binary = Path(temporary) / ("dexrove.exe" if target_os == "windows" else "dexrove")
+            with tempfile.TemporaryDirectory(prefix="clibble-release-") as temporary:
+                binary = Path(temporary) / ("clibble.exe" if target_os == "windows" else "clibble")
                 env = dict(os.environ, GOOS=target_os, GOARCH=arch, CGO_ENABLED="0")
                 subprocess.run(
                     ["go", "build", "-trimpath", "-ldflags", f"-s -w -X main.version={version}", "-o", str(binary), "."],
                     cwd=root, env=env, check=True,
                 )
                 suffix = ".zip" if target_os == "windows" else ".tar.gz"
-                artifact = output / f"dexrove_{version}_{target_os}_{arch}{suffix}"
+                artifact = output / f"clibble_{version}_{target_os}_{arch}{suffix}"
                 files = [(binary, binary.name), (root / "README.md", "README.md"), (root / "LICENSE", "LICENSE"), (root / "THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md")]
                 for folder in ("readme-assets", "licenses", "docs"):
                     files.extend((source, str(source.relative_to(root))) for source in sorted((root / folder).rglob("*")) if source.is_file())

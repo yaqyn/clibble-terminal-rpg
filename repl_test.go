@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/yaqyn/dexrove/internal/pokeapi"
+	"github.com/yaqyn/clibble/internal/pokeapi"
 	"io"
 	"reflect"
 	"strings"
@@ -59,7 +59,7 @@ func TestREPLCatchInspectPokedex(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"you have not caught that pokemon", "pidgey was caught!", "Name: pidgey", "Height: 3", "Weight: 18", "Your collection:\n - pidgey", "Leaving Dexrove. See you on the next trail."} {
+	for _, want := range []string{"you have not caught that pokemon", "pidgey was caught!", "Name: pidgey", "Height: 3", "Weight: 18", "Your collection:\n - pidgey", "Leaving Clibble. See you on the next trail."} {
 		if !strings.Contains(out.String(), want) {
 			t.Errorf("missing %q in %s", want, out.String())
 		}

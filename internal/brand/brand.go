@@ -1,4 +1,4 @@
-// Package brand owns Dexrove's shared product identity and palette.
+// Package brand owns Clibble's shared product identity and palette.
 package brand
 
 import (

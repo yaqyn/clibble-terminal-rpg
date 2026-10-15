@@ -1,6 +1,6 @@
 # Architecture
 
-Dexrove is one Go binary with two interfaces over the same local collection.
+Clibble is one Go binary with two interfaces over the same local collection.
 The terminal owns catching and saving; the web companion is an independent,
 read-only view. No JavaScript build step or external asset server is required.
 

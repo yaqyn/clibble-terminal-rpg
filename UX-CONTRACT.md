@@ -1,4 +1,4 @@
-# Dexrove interaction contract
+# Clibble interaction contract
 
 ## Sources and canonical owners
 

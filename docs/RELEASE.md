@@ -4,8 +4,8 @@
 2. Commit the intended release scope. The packaging script requires a clean tree.
 3. Run `python3 scripts/release.py vMAJOR.MINOR.PATCH`.
 4. From `dist/vMAJOR.MINOR.PATCH`, verify `sha256sum -c SHA256SUMS`.
-5. Extract the matching platform archive and run `dexrove -version` and
-   `dexrove -ephemeral help`. Verify save/restart behavior in an isolated directory.
+5. Extract the matching platform archive and run `clibble -version` and
+   `clibble -ephemeral help`. Verify save/restart behavior in an isolated directory.
 
 The script builds Linux, macOS, and Windows binaries for amd64 and arm64 with
 CGO disabled. Archives include the README, vector artwork, application license,

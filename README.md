@@ -1,14 +1,14 @@
-![Dexrove — Explore. Catch. Keep.](readme-assets/cover.webp)
+![Clibble — A little wild in your terminal.](readme-assets/cover.webp)
 
-# Dexrove — A field guide for your next catch
+# Clibble — A field guide for your next catch
 
 Explore Pokemon locations, catch what you find, and build a collection worth coming back to.
-Dexrove is a terminal-first Pokemon field guide: discover locations, build a collection,
+Clibble is a terminal-first Pokemon field guide: discover locations, build a collection,
 and read creature records without leaving your shell. An optional local browser view
 complements the CLI when you want to browse saved records visually.
 Your collection stays on your device. No account, API key, or subscription.
 
-[Download the CLI](https://github.com/yaqyn/dexrove/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
+[Download the CLI](https://github.com/yaqyn/clibble/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
 
 ## <img src="readme-assets/icons/features.svg" width="24" height="24" alt=""> Features
 
@@ -21,25 +21,25 @@ Your collection stays on your device. No account, API key, or subscription.
 ## <img src="readme-assets/icons/installation.svg" width="24" height="24" alt=""> Installation
 
 Download the archive for your operating system and architecture from the
-[releases page](https://github.com/yaqyn/dexrove/releases/latest), verify it against
-`SHA256SUMS`, and extract it. Run `dexrove` on Linux/macOS or `dexrove.exe` on Windows.
+[releases page](https://github.com/yaqyn/clibble/releases/latest), verify it against
+`SHA256SUMS`, and extract it. Run `clibble` on Linux/macOS or `clibble.exe` on Windows.
 The compiled app includes the web interface and font; it needs no Go, Node, or Python runtime.
 New exploration and catch data require internet access to PokéAPI.
 
 To build from source, install the Go version declared in [go.mod](go.mod) or newer:
 
 ```bash
-git clone https://github.com/yaqyn/dexrove.git
-cd dexrove
-go build -trimpath -o dexrove .
+git clone https://github.com/yaqyn/clibble.git
+cd clibble
+go build -trimpath -o clibble .
 ```
 
-On Windows, use `-o dexrove.exe`. Go downloads pinned build dependencies on the first build.
+On Windows, use `-o clibble.exe`. Go downloads pinned build dependencies on the first build.
 
 ## <img src="readme-assets/icons/launch.svg" width="24" height="24" alt=""> Quick start
 
 ```bash
-./dexrove
+./clibble
 ```
 
 At the prompt:
@@ -54,7 +54,7 @@ exit
 ```
 
 Catches can escape; try again until you succeed. Successful catches save automatically.
-Restart Dexrove to restore your collection. Use `help` for the grouped field guide
+Restart Clibble to restore your collection. Use `help` for the grouped field guide
 and Ctrl+C or `exit` to leave. Tab completes command names; the up/down arrows
 recall the last 100 commands in this session. History is never written to disk.
 
@@ -77,9 +77,9 @@ Commands and identifiers are case-insensitive. The original `pokedex` command
 remains an alias for `collection`. Use single commands or pipe a batch:
 
 ```bash
-./dexrove inspect pidgey
-./dexrove collection
-printf 'collection\nexit\n' | ./dexrove
+./clibble inspect pidgey
+./clibble collection
+printf 'collection\nexit\n' | ./clibble
 ```
 
 Pipes omit banners, color, and prompts. Results go to stdout; errors go to stderr.
@@ -91,7 +91,7 @@ and report failure at the end; an escaped catch is a valid outcome, not a comman
 To open the collection in a browser, run this in another terminal:
 
 ```bash
-./dexrove serve
+./clibble serve
 ```
 
 Open **http://127.0.0.1:8787**. Search your saved Pokemon by name or type, then choose
@@ -111,7 +111,7 @@ See the [user guide](docs/GUIDE.md) for flags, storage locations, recovery, and 
 | `-port <number>` | `8787` | Select the local companion's port |
 | `-version` / `-h` | — | Print version / flags |
 
-Flags precede commands: `./dexrove -data ./collection.json serve`.
+Flags precede commands: `./clibble -data ./collection.json serve`.
 Existing Pokedex saves remain accessible automatically; no collection is moved or reset.
 See [save compatibility](docs/GUIDE.md#save-compatibility).
 
@@ -143,7 +143,7 @@ npm test
 Tests cover catch/escape outcomes, pagination, cached requests, malformed responses,
 timeouts, save recovery and locking, legacy-save discovery, plain CLI output,
 local web API boundaries, search, selection, empty states, and refresh failures.
-[CI](https://github.com/yaqyn/dexrove/actions/workflows/ci.yml) runs native Go checks
+[CI](https://github.com/yaqyn/clibble/actions/workflows/ci.yml) runs native Go checks
 on Linux, macOS, and Windows. See [release preparation](docs/RELEASE.md) for packaging.
 
 ## <img src="readme-assets/icons/security.svg" width="24" height="24" alt=""> Security and limitations
@@ -162,4 +162,4 @@ their respective owners; data is provided by [PokéAPI](https://pokeapi.co/).
 
 > Based on Boot.dev's [Build a Pokedex in Go](https://www.boot.dev/courses/build-pokedex-cli-golang),
 > extended with persistent saves, scriptable commands, a local collection companion,
-> and the Dexrove identity.
+> and the Clibble identity.

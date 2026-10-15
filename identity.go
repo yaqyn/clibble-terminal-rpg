@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/yaqyn/dexrove/internal/brand"
+	"github.com/yaqyn/clibble/internal/brand"
 )
 
 // defaultCollection preserves the existing collection and its original lock.
@@ -16,11 +16,15 @@ func defaultCollection(dir string) (string, error) {
 	} else if !os.IsNotExist(err) {
 		return "", err
 	}
-	legacy := filepath.Join(dir, "pokedex", "pokedex.json")
-	if _, err := os.Stat(legacy); err == nil {
-		return legacy, nil
-	} else if !os.IsNotExist(err) {
-		return "", err
+	for _, legacy := range []string{
+		filepath.Join(dir, "dexrove", "collection.json"),
+		filepath.Join(dir, "pokedex", "pokedex.json"),
+	} {
+		if _, err := os.Stat(legacy); err == nil {
+			return legacy, nil
+		} else if !os.IsNotExist(err) {
+			return "", err
+		}
 	}
 	return path, nil
 }
