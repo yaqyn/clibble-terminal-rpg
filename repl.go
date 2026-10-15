@@ -24,7 +24,7 @@ func execute(cfg *config, words []string) error {
 	}
 	cmd, ok := cfg.commands[words[0]]
 	if !ok {
-		return fmt.Errorf("Unknown command: %q", words[0])
+		return fmt.Errorf("Unknown command: %q. Use help to see available commands.", words[0])
 	}
 	args := words[1:]
 	if len(args) != cmd.args {
@@ -49,19 +49,40 @@ func runREPL(cfg *config, in io.Reader) error {
 	lines := make(chan inputLine)
 	stopScan := make(chan struct{})
 	defer close(stopScan)
+
+	readLine := cfg.readLine
+	if readLine == nil {
+		readLine = func() (string, error) {
+			if scanner.Scan() {
+				return scanner.Text(), nil
+			}
+			if err := scanner.Err(); err != nil {
+				return "", err
+			}
+			return "", io.EOF
+		}
+	}
 	go func() {
-		for scanner.Scan() {
+		for {
+			text, err := readLine()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					err = nil
+				}
+				select {
+				case lines <- inputLine{done: true, err: err}:
+				case <-stopScan:
+				}
+				return
+			}
 			select {
-			case lines <- inputLine{text: scanner.Text()}:
+			case lines <- inputLine{text: text}:
 			case <-stopScan:
 				return
 			}
 		}
-		select {
-		case lines <- inputLine{done: true, err: scanner.Err()}:
-		case <-stopScan:
-		}
 	}()
+
 	failed := false
 	finish := func(err error) error {
 		if err != nil {

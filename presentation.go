@@ -33,7 +33,7 @@ func (v *terminalView) welcome(count int, persistent bool) {
 		mode = "Collection saved automatically"
 	}
 	fmt.Fprintf(v.out, "\n%d caught · %s\n", count, mode)
-	fmt.Fprintln(v.out, "Start with map, catch pidgey, or collection.\nUse help for commands; exit to leave.")
+	fmt.Fprintln(v.out, "Start with map, catch pidgey, or collection.\nTab completes commands. Up/down recalls this session.\nUse help for commands; exit or Ctrl+C to leave.")
 }
 func (v *terminalView) help() {
 	v.title("Dexrove field guide")
@@ -78,7 +78,7 @@ func (v *terminalView) inspect(p pokeapi.Pokemon) {
 		}
 		fmt.Fprintf(v.out, "  %-17s %3d  %s\n", stat.Stat.Name, stat.BaseStat, v.accent(strings.Repeat("━", length)+strings.Repeat("·", 20-length)))
 	}
-	fmt.Fprintln(v.out, "\nSaved in your collection. Available offline.")
+	fmt.Fprintln(v.out, "\nStored in this collection. Read without a network request.")
 }
 func (v *terminalView) collection(pokemon map[string]pokeapi.Pokemon) {
 	v.title("Your collection")
@@ -100,4 +100,26 @@ func (v *terminalView) collection(pokemon map[string]pokeapi.Pokemon) {
 		}
 	}
 	fmt.Fprintln(v.out, "\nUse inspect <pokemon> to open a record.")
+}
+
+func (v *terminalView) locations(areas []pokeapi.Resource) {
+	v.title("Location areas")
+	columns := 1
+	if v.width >= 90 {
+		columns = 2
+		for _, area := range areas {
+			if len(area.Name)+4 > v.width/2 {
+				columns = 1
+				break
+			}
+		}
+	}
+	for index, area := range areas {
+		if columns == 2 && index%2 == 0 && index+1 < len(areas) {
+			fmt.Fprintf(v.out, "  %-*s", v.width/2-2, area.Name)
+		} else {
+			fmt.Fprintf(v.out, "  %s\n", area.Name)
+		}
+	}
+	fmt.Fprintln(v.out, "\nmap: next areas  ·  mapb: previous areas\nexplore <area>: see who lives here")
 }

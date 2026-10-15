@@ -148,6 +148,13 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 		return err
 	}
 	if cfg.view != nil {
+		restore, err := enableEditor(cfg, in, out)
+		if err != nil {
+			return err
+		}
+		defer restore()
+	}
+	if cfg.view != nil {
 		cfg.view.welcome(len(cfg.pokedex), cfg.save != nil)
 	}
 	return runREPL(cfg, in)

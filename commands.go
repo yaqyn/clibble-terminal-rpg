@@ -25,6 +25,7 @@ type pokemonAPI interface {
 	GetPokemon(context.Context, string) (pokeapi.Pokemon, error)
 }
 type config struct {
+	readLine func() (string, error)
 	view     *terminalView
 	errOut   io.Writer
 	prompt   bool
@@ -99,8 +100,12 @@ func showLocations(cfg *config, page *string) error {
 	if err != nil {
 		return err
 	}
-	for _, area := range result.Results {
-		fmt.Fprintln(cfg.out, area.Name)
+	if cfg.view != nil {
+		cfg.view.locations(result.Results)
+	} else {
+		for _, area := range result.Results {
+			fmt.Fprintln(cfg.out, area.Name)
+		}
 	}
 	cfg.next, cfg.previous, cfg.started = result.Next, result.Previous, true
 	return nil
