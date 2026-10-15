@@ -12,7 +12,7 @@ attempt a catch. Base experience affects the probability; higher experience mean
 a lower chance. An escape does not change your collection.
 
 A successful catch saves immediately. `inspect pidgey` reads the stored record;
-`collection` lists caught names. Interactive records convert height/weight to
+`collection` lists caught names, and `count` prints the number of distinct catches offline. Interactive records convert height/weight to
 metres/kilograms. Plain CLI output keeps PokéAPI's original decimetres/hectograms.
 
 ## The local companion

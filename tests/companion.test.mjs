@@ -112,6 +112,15 @@ test("refresh reconciles selection and renders text without HTML execution", asy
     app.document.querySelector(".measurements dd").textContent,
     "0.3 m",
   );
+  const unsafeName = '<img src=x onerror="alert(1)">';
+  app.replace([creature(unsafeName, "flying")]);
+  app.document.querySelector("#refresh").click();
+  await tick();
+  assert.equal(
+    app.document.querySelector("#record-title").textContent,
+    unsafeName,
+  );
+  assert.equal(app.document.querySelector("#detail img"), null);
   app.dom.window.close();
 });
 

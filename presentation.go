@@ -47,7 +47,7 @@ func (v *terminalView) help() {
 		commands [][2]string
 	}{
 		{"Explore", [][2]string{{"map", "Next 20 areas"}, {"mapb", "Previous areas"}, {"explore <area>", "Find Pokemon in an area"}}},
-		{"Collect", [][2]string{{"catch <pokemon>", "Attempt a catch"}, {"collection", "Browse your caught Pokemon"}, {"inspect <pokemon>", "Read a creature's field record"}}},
+		{"Collect", [][2]string{{"catch <pokemon>", "Attempt a catch"}, {"collection", "Browse your caught Pokemon"}, {"count", "Count caught Pokemon offline"}, {"inspect <pokemon>", "Read a creature's field record"}}},
 		{"Session", [][2]string{{"help", "Show this field guide"}, {"exit", "Leave Dexrove"}}},
 	} {
 		fmt.Fprintf(v.out, "\n%s\n", v.accent(group.title))
