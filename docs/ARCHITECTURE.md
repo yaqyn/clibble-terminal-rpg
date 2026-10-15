@@ -6,7 +6,7 @@ read-only view. No JavaScript build step or external asset server is required.
 
 ```mermaid
 flowchart LR
-    CLI[Terminal commands] --> Client[Typed PokeAPI client]
+    CLI[RPG screen or terminal commands] --> Client[Typed PokeAPI client]
     Client <--> Cache[Bounded TTL cache]
     Client --> API[HTTPS PokeAPI]
     CLI --> Save[Validated JSON and writer lock]
@@ -19,7 +19,9 @@ flowchart LR
 
 - `main.go`, `identity.go`: flags, modes, dependency wiring, save discovery, and graceful cancellation.
 - `repl.go`, `commands.go`: normalized input, command dispatch, pagination, catching, and collection behavior.
-- `presentation.go`: interactive-only rendering. Script output stays linear and plain.
+- `game.go`, `game_view.go`: Bubble Tea model, asynchronous tasks, keyboard navigation, and alternate-screen rendering.
+- `catch.go`: shared catch transaction over a collection snapshot; publish only after save success.
+- `presentation.go`, `editor.go`: plain prompt rendering and editing. Script output stays linear and plain.
 - `storage*.go`: bounded schema loading, temporary-file replacement, platform replacement methods, and exclusive advisory locks.
 - `companion.go`: loopback HTTP server, host/origin validation, read-only JSON, and security headers.
 - `internal/webui`: embedded HTML, CSS, JavaScript, mark, and locally licensed font.
@@ -29,7 +31,7 @@ flowchart LR
 
 The save format is version 1: a map of canonical Pokemon names and their typed
 records. A successful catch is persisted before success is reported. Failed saves
-remove the uncommitted catch from memory. A save is at most 4 MiB; malformed data
+leave the live collection unchanged. A save is at most 4 MiB; malformed data
 blocks startup. The CLI holds a writer lock for the session, while the companion
 reads snapshots without acquiring the writer lock.
 
@@ -60,3 +62,17 @@ Names enter the DOM through textContent, never HTML interpolation.
 Go tests verify HTTP/save boundaries. Development-only DOM tests exercise search,
 selection, clear/focus, empty states, and failed refresh. These tests do not replace
 real-browser layout, keyboard, or accessibility verification.
+
+## Screen state and shutdown
+
+The RPG model owns menu selection, session location, and narration. Network work
+returns typed messages with request IDs; cancelled or stale responses cannot
+replace the current screen. Workers use collection snapshots and do not mutate
+the live model. Catch/save uses the same transaction as command mode. Keyboard
+input cannot start a second catch while one is running.
+
+Tasks start before their receive command is returned, and are tracked independently
+of the renderer. On exit the task context is cancelled and workers are drained
+before `runGame` returns, so the outer save-lock defer cannot run while a save is
+still active. Bubble Tea owns terminal mode, cursor, resize events, and alternate
+screen restoration. `-plain`, non-TTY input/output, or `TERM=dumb` bypasses the screen.

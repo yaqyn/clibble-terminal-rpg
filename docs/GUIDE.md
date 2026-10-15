@@ -1,10 +1,32 @@
 # Using Clibble
 
 Clibble is an independent Pokemon field guide. Start `clibble` for the interactive
-CLI, run `clibble <command>` for a single operation, or `clibble serve` to browse a
+RPG screen, use `clibble -plain` for the command prompt, run `clibble <command>` for a single operation, or `clibble serve` to browse a
 saved collection in your browser.
 
-## Finding and catching Pokemon
+## Playing at the terminal
+
+Launch `clibble` in a supported terminal. Use up/down (or j/k) and Enter/Space to
+choose **Travel**, a destination, a Pokemon, then **Throw a Pokeball**. The narration
+addresses you as the explorer. You can retry after an escape; after a catch, choose
+**Inspect your catch**. Your collection and its field records also work offline.
+
+Esc/Backspace goes back. Left/right changes destination pages. `t`, `c`, and `?`
+open travel, collection, and help. `r` retries a failed action. Up/down scrolls
+long records/help; Home/End jump to the first/last item. Menus scroll to keep the
+selection visible. Return from an encounter or record restores your selection.
+`q` or Ctrl+C leaves. During a catch, additional actions are disabled until the
+outcome is settled. Shutdown cancels requests and waits for any active save before
+releasing the collection lock.
+
+The minimum screen is 40 × 18. Resize a smaller terminal or use `-plain`. The RPG
+screen uses the alternate terminal buffer and restores it on exit. It has no
+mouse requirement, automatic animations, battles, or tile-based movement. Travel
+means choosing a PokéAPI location; your current location lasts this session only.
+`-ephemeral` keeps catches only until you leave. Dumb terminals automatically use
+the command interface; pipes remain plain text.
+
+## Command prompt and one-shot commands
 
 `map` lists 20 location areas. Repeat it for the next page; `mapb` moves back.
 `explore pastoria-city-area` lists the Pokemon found there. Use `catch pidgey` to
@@ -69,7 +91,7 @@ available as historical software.
 
 ## Terminal and scripts
 
-The interactive view shows a brief welcome, grouped help, creature profiles, and
+The `-plain` interactive view shows a brief welcome, grouped help, creature profiles, and
 collection summaries. It uses your existing terminal font/background and never
 switches to a fullscreen display. On supported terminals, the line editor supports
 Tab command completion, up/down history, cursor movement, and editing shortcuts.
@@ -79,7 +101,7 @@ Its last 100 commands stay in memory only. Terminal settings are restored on exi
 `always` option is only for interactive presentation; redirected results stay plain.
 
 ```bash
-clibble -color never
+clibble -plain -color never
 clibble -timeout 5s catch pidgey
 clibble -data ./collection.json inspect pidgey
 printf 'collection\nexit\n' | clibble

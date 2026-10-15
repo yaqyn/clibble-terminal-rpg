@@ -12,7 +12,7 @@ Your collection stays on your device. No account, API key, or subscription.
 
 ## <img src="readme-assets/icons/features.svg" width="24" height="24" alt=""> Features
 
-- **Stay in the terminal.** Use grouped help, Tab completion, session history, and readable creature profiles.
+- **Play in the terminal.** Choose with arrows and Enter, follow the narration, and inspect your catches.
 - **Follow a new trail.** Browse location areas and discover the Pokemon that live there.
 - **Make the catch.** Try your luck, save successful catches, and return to their records offline.
 - **See your collection.** Search by name or type in the read-only web companion; compare stats and measurements.
@@ -42,22 +42,27 @@ On Windows, use `-o clibble.exe`. Go downloads pinned build dependencies on the 
 ./clibble
 ```
 
-At the prompt:
+You arrive at the trailhead. Choose **Travel**, select a destination, then approach
+a Pokemon and choose **Throw a Pokeball**. After a successful catch, choose
+**Inspect your catch** to open its saved record. Your catches save automatically.
 
-```text
-map
-explore pastoria-city-area
-catch pidgey
-inspect pidgey
-collection
-exit
-```
+| Key | Action |
+| --- | --- |
+| Up / Down or `j` / `k` | Move through choices; scroll records and help |
+| Enter / Space | Choose the highlighted action |
+| Esc / Backspace | Go back; cancel travel or exploration |
+| Left / Right | Browse destination pages |
+| `t` / `c` / `?` | Open travel / collection / field guide |
+| `r` | Retry a failed action |
+| `q` / Ctrl+C | Leave safely |
 
-Catches can escape; try again until you succeed. Successful catches save automatically.
-Restart Clibble to restore your collection. Use `help` for the grouped field guide
-and Ctrl+C or `exit` to leave. Tab completes command names; the up/down arrows
-recall the last 100 commands in this session. History is never written to disk.
+The RPG screen needs a terminal at least 40 columns × 18 rows. It adapts to resizing
+and restores your terminal when you leave. Location and menu position last for the
+session; your caught Pokemon remain saved. Catches can escape; you can try again.
 
+For the command prompt, use `./clibble -plain`. It keeps grouped help, Tab command
+completion, and the last 100 commands in memory. Scripts and one-shot commands
+continue to work directly.
 
 ## <img src="readme-assets/icons/usage.svg" width="24" height="24" alt=""> Usage
 
@@ -105,6 +110,7 @@ See the [user guide](docs/GUIDE.md) for flags, storage locations, recovery, and 
 | Flag | Default | Purpose |
 | --- | --- | --- |
 | `-data <path>` | Platform user directory | Choose a collection file |
+| `-plain` | Off | Use the command prompt instead of the RPG screen |
 | `-ephemeral` | Off | Use a temporary CLI collection without saves |
 | `-timeout <duration>` | `10s` | Bound each API request |
 | `-color auto\|always\|never` | `auto` | Control interactive terminal color |
@@ -140,7 +146,8 @@ npm ci
 npm test
 ```
 
-Tests cover catch/escape outcomes, pagination, cached requests, malformed responses,
+Tests cover RPG navigation, cancellation, stale results, shutdown during saves,
+small-screen layouts, catch/escape outcomes, pagination, cached requests, malformed responses,
 timeouts, save recovery and locking, legacy-save discovery, plain CLI output,
 local web API boundaries, search, selection, empty states, and refresh failures.
 [CI](https://github.com/yaqyn/clibble/actions/workflows/ci.yml) runs native Go checks

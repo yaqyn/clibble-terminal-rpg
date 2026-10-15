@@ -31,7 +31,9 @@ The tagline is “A little wild in your terminal.” Avoid technical internals i
 
 Ownership of local data, reliable saves, readable interfaces, and honest scope.
 Make discovering and catching Pokemon feel like a small adventure at the prompt.
-Use warm character art for brand imagery; keep actual CLI output readable and concise.
+Use warm character art for brand imagery. Interactive play uses a full-window RPG
+screen with arrow/Enter navigation and second-person narration; `-plain` retains
+the command prompt. Keep actual output readable and concise.
 The cover is a conceptual title screen, not a promise of a navigable ASCII world.
 
 ## Goals

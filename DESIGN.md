@@ -43,8 +43,9 @@ The memorable feature is the prompt becoming a path. Clibble is pronounced
 “clib-ul”; CLI is tucked into a name that sounds like a small companion.
 “A little wild in your terminal.” is the invitation.
 
-The terminal is the main product. Keep its actual output linear, quick to scan,
-and respectful of the user's font and background. The cover can express the
+The terminal is the main product. Use a full-window RPG screen for interactive play, with a highlighted choice,
+a small ASCII clearing, and a second-person narration box. Respect the user's
+font and background; use Fern for selection and headings. The cover can express the
 imagined world; it must not claim an ASCII map renderer, battles, or movement.
 The read-only web companion is a quiet collection album with pine and fern
 accents, pale leaf surfaces, and the same prompt-and-cursor mark.
@@ -70,9 +71,14 @@ are sentence case; numbers align with tabular figures. Body lines stay below
 index and an adjacent creature record on wide screens, stacked on narrow screens.
 Records stay readable at 320px; details have no fixed viewport height.
 
-The CLI uses the user's terminal font. It does not clear the screen automatically, animate, or hide the cursor.
-The line editor temporarily uses raw input and restores the previous terminal
-state on exit. It provides Tab completion and a bounded in-memory history. Narrow terminals get linear records.
+The default interactive CLI uses Bubble Tea's alternate screen. Menus use arrows
+and Enter, a text chevron marks selection without relying on color, and the
+narration addresses the player as you. No automatic animation or artificial waits.
+At 88 columns and above, scene/details sit beside the choices. Narrow terminals
+use a single column. Below 40 × 18, show a resize hint and allow safe exit.
+Long lists and records scroll; returning restores the prior selected item.
+The `-plain` mode keeps the linear command prompt, Tab completion, and bounded
+in-memory history. Bubble Tea or the line editor restores terminal mode on exit.
 Color is optional and never carries meaning alone. Piped output remains plain.
 
 Web controls have explicit hover, focus, selected, disabled, and loading states.
