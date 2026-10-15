@@ -1,5 +1,8 @@
 # Third-party notices
 
+The web companion bundles [Manrope](https://github.com/google/fonts/tree/main/ofl/manrope),
+licensed under the [SIL Open Font License](licenses/manrope-OFL.txt).
+
 The compiled CLI includes these Go libraries, pinned by `go.mod` and `go.sum`:
 
 | Library | Purpose | License |

@@ -27,6 +27,8 @@ components:
   creature-record:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text}"
+  caption:
+    textColor: "{colors.muted}"
   terminal:
     textColor: "{colors.terminal-accent}"
 ---
@@ -37,6 +39,7 @@ components:
 
 The reference is a contemporary field atlas: a route, a clear species record,
 and space to notice what matters. The memorable feature is the open-route D mark.
+The terminal is the primary product; the read-only browser view is a complement.
 The interface supports that motif with calm cobalt and mist surfaces, rather
 than reproducing a game console or turning the app into a dashboard of metrics.
 
@@ -62,8 +65,9 @@ are sentence case; numbers align with tabular figures. Body lines stay below
 index and an adjacent creature record on wide screens, stacked on narrow screens.
 Records stay readable at 320px; details have no fixed viewport height.
 
-The CLI uses the user's terminal font. It does not clear the screen, change
-terminal modes, animate, or hide the cursor. Narrow terminals get linear records.
+The CLI uses the user's terminal font. It does not clear the screen automatically, animate, or hide the cursor.
+The line editor temporarily uses raw input and restores the previous terminal
+state on exit. It provides Tab completion and a bounded in-memory history. Narrow terminals get linear records.
 Color is optional and never carries meaning alone. Piped output remains plain.
 
 Web controls have explicit hover, focus, selected, disabled, and loading states.

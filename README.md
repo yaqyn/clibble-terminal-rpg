@@ -1,155 +1,129 @@
-![Pokedex terminal field guide](readme-assets/cover.svg)
+![Dexrove — Explore. Catch. Keep.](readme-assets/cover.webp)
 
-# Pokedex — A Pokemon field guide for your terminal
+# Dexrove — A field guide for your next catch
 
-Explore location areas, catch Pokemon, and inspect the collection you've built.
-Pokedex uses PokéAPI for world data and saves caught Pokemon automatically,
-so your collection is available when you return. Use the interactive prompt
-or run individual commands from your shell.
+Explore Pokemon locations, catch what you find, and build a collection worth coming back to.
+Dexrove is a terminal-first Pokemon field guide: discover locations, build a collection,
+and read creature records without leaving your shell. An optional local browser view
+complements the CLI when you want to browse saved records visually.
+Your collection stays on your device. No account, API key, or subscription.
 
-[Download v1.0.0](https://github.com/yaqyn/pokedex/releases/tag/v1.0.0) or [run from source](#-quick-start). New API data requires an internet connection. No account,
-API key, or runtime dependencies are needed for a compiled binary.
+[Download the CLI](https://github.com/yaqyn/dexrove/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
 
 ## <img src="readme-assets/icons/features.svg" width="24" height="24" alt=""> Features
 
-- Browse location areas in pages of 20 and discover the Pokemon found in each area.
-- Catch Pokemon with an experience-based probability, then inspect their stats and types offline.
-- Save catches immediately and restore them when you restart, with one writer per collection.
-- Run individual commands or pipe batches with failure exit codes for scripts.
-- Reuse API responses through a concurrent cache with expiration and memory bounds.
-- Handle failed requests, invalid commands, EOF, and interruption without losing previous saves.
+- **Stay in the terminal.** Use grouped help, Tab completion, session history, and readable creature profiles.
+- **Follow a new trail.** Browse location areas and discover the Pokemon that live there.
+- **Make the catch.** Try your luck, save successful catches, and return to their records offline.
+- **See your collection.** Search by name or type in the read-only web companion; compare stats and measurements.
+- **Keep control.** Local saves, single-writer locks, bounded requests, and plain script output protect the useful parts of a small tool.
 
 ## <img src="readme-assets/icons/installation.svg" width="24" height="24" alt=""> Installation
 
 Download the archive for your operating system and architecture from the
-[release page](https://github.com/yaqyn/pokedex/releases/tag/v1.0.0), verify it against
-`SHA256SUMS`, and extract it. Run the included `pokedex` binary (`pokedex.exe` on
-Windows). Release archives include the README and dependency notices.
+[releases page](https://github.com/yaqyn/dexrove/releases/latest), verify it against
+`SHA256SUMS`, and extract it. Run `dexrove` on Linux/macOS or `dexrove.exe` on Windows.
+The compiled app includes the web interface and font; it needs no Go, Node, or Python runtime.
+New exploration and catch data require internet access to PokéAPI.
 
-Source builds require the Go version declared in [go.mod](go.mod) or newer.
-Go downloads the pinned build dependencies on the first build:
-
-```bash
-git clone https://github.com/yaqyn/pokedex.git
-cd pokedex
-```
-
-Then build from the project root:
+To build from source, install the Go version declared in [go.mod](go.mod) or newer:
 
 ```bash
-go build -trimpath -o pokedex .
+git clone https://github.com/yaqyn/dexrove.git
+cd dexrove
+go build -trimpath -o dexrove .
 ```
 
-On Windows, build with `-o pokedex.exe` and run `./pokedex.exe` in PowerShell.
-Collection locking supports Linux, macOS, and Windows.
+On Windows, use `-o dexrove.exe`. Go downloads pinned build dependencies on the first build.
 
 ## <img src="readme-assets/icons/launch.svg" width="24" height="24" alt=""> Quick start
 
 ```bash
-./pokedex
+./dexrove
 ```
 
-At the prompt, enter:
+At the prompt:
 
 ```text
 map
 explore pastoria-city-area
 catch pidgey
 inspect pidgey
-pokedex
+collection
 exit
 ```
 
-A catch can succeed or escape; repeat `catch pidgey` until it succeeds. You should
-then see its name, height, weight, stats, and types with `inspect pidgey`.
-Restart the CLI to restore the collection. `exit` closes the session; Ctrl+C
-also stops it. Use `-ephemeral` when you want a temporary collection.
+Catches can escape; try again until you succeed. Successful catches save automatically.
+Restart Dexrove to restore your collection. Use `help` for the grouped field guide
+and Ctrl+C or `exit` to leave. Tab completes command names; the up/down arrows
+recall the last 100 commands in this session. History is never written to disk.
+
 
 ## <img src="readme-assets/icons/usage.svg" width="24" height="24" alt=""> Usage
 
-Use `count` to print the number of distinct caught Pokemon offline. Commands and Pokemon/area names are case-insensitive. Names use letters, digits,
-and hyphens. Missing or extra arguments show the command's usage.
-
-| Command | Result |
+| Command | What it does |
 | --- | --- |
-| `help` | List every command and its description |
-| `map` | Show the next 20 location areas |
-| `mapb` | Show the previous page, or explain that you're on the first page |
-| `explore <area>` | List the Pokemon encountered in an area |
-| `catch <pokemon>` | Attempt a catch; higher base experience lowers the probability |
-| `inspect <pokemon>` | Show details of a Pokemon you've caught |
-| `pokedex` | List caught Pokemon in alphabetical order |
-| `exit` | Close the session |
+| `help` | Show the field guide |
+| `map` / `mapb` | Browse the next / previous page of location areas |
+| `explore <area>` | List Pokemon in a location area |
+| `catch <pokemon>` | Attempt a catch; higher base experience lowers the chance |
+| `inspect <pokemon>` | Read a caught Pokemon's record without a network request |
+| `collection` | List your caught Pokemon |
+| `count` | Print the number of distinct caught Pokemon offline |
+| `serve` | Start the local web companion; run this from your shell |
+| `exit` | Leave the interactive session |
 
-Height and weight retain [PokéAPI's units](https://pokeapi.co/docs/v2#pokemon): decimetres and hectograms.
-For example, Pidgey's height of `3` means 0.3 metres, and its weight of `18`
-means 1.8 kilograms.
-
-Run one command directly or pipe a batch:
+Commands and identifiers are case-insensitive. The original `pokedex` command
+remains an alias for `collection`. Use single commands or pipe a batch:
 
 ```bash
-./pokedex inspect pidgey
-./pokedex pokedex
-printf 'help\npokedex\nexit\n' | ./pokedex
+./dexrove inspect pidgey
+./dexrove collection
+printf 'collection\nexit\n' | ./dexrove
 ```
 
-Single commands omit the prompt and return a nonzero status on failure. Piped
-batches keep processing after command errors, then return a nonzero status if
-any command failed. Errors go to stderr; results go to stdout. The interactive
-REPL remains usable after errors. A Pokemon escaping is a successful catch
-attempt, so it does not produce a failure exit code.
+Pipes omit banners, color, and prompts. Results go to stdout; errors go to stderr.
+A failed command produces a nonzero exit status. Batches continue after errors
+and report failure at the end; an escaped catch is a valid outcome, not a command error.
+
+### Optional browser companion
+
+To open the collection in a browser, run this in another terminal:
+
+```bash
+./dexrove serve
+```
+
+Open **http://127.0.0.1:8787**. Search your saved Pokemon by name or type, then choose
+one to read its record. Catch in the CLI and use **Refresh collection** to see new
+records. The companion is local and read-only; it does not expose writes or share your collection online.
+
+See the [user guide](docs/GUIDE.md) for flags, storage locations, recovery, and examples.
 
 ## <img src="readme-assets/icons/configuration.svg" width="24" height="24" alt=""> Configuration
 
 | Flag | Default | Purpose |
 | --- | --- | --- |
-| `-data <path>` | Platform user directory | Override the collection file; create parent directories as needed |
-| `-ephemeral` | Disabled | Use a temporary collection without reading or writing saves |
-| `-timeout <duration>` | `10s` | Bound each API request, e.g. `-timeout 5s` |
-| `-version` | — | Print the build version (`dev` for a source build) |
-| `-h` | — | Show flags |
+| `-data <path>` | Platform user directory | Choose a collection file |
+| `-ephemeral` | Off | Use a temporary CLI collection without saves |
+| `-timeout <duration>` | `10s` | Bound each API request |
+| `-color auto\|always\|never` | `auto` | Control interactive terminal color |
+| `-port <number>` | `8787` | Select the local companion's port |
+| `-version` / `-h` | — | Print version / flags |
 
-Flags precede the command, for example `./pokedex -data ./collection.json pokedex`.
-`-data` and `-ephemeral` cannot be combined. The default collection locations are:
-
-- Linux: `$XDG_CONFIG_HOME/pokedex/pokedex.json`, or `~/.config/pokedex/pokedex.json`.
-- macOS: `~/Library/Application Support/pokedex/pokedex.json`.
-- Windows: `%AppData%\pokedex\pokedex.json`.
-
-Parent directories are created automatically. JSON saves are versioned and
-bounded to 4 MiB. New directories and files use owner-only permissions on Unix;
-Windows uses the current user's filesystem access controls. A malformed or
-unsupported save stops startup and is left untouched. Back up the JSON file
-before editing it.
-
-A `.lock` file beside the save coordinates writers. A second session using the
-same save fails with a clear error. The operating system releases the lock when
-the process exits; the empty lock file can remain. Locks are advisory: other
-programs that ignore them can still modify the JSON. Use a local filesystem.
-
-If PokéAPI returns HTTP 404, check the name; HTTP 429 means you should wait before
-retrying. Request failures do not advance map pagination or add catches. A save
-failure rolls back the new catch in memory so the CLI does not claim it was saved.
+Flags precede commands: `./dexrove -data ./collection.json serve`.
+Existing Pokedex saves remain accessible automatically; no collection is moved or reset.
+See [save compatibility](docs/GUIDE.md#save-compatibility).
 
 ## <img src="readme-assets/icons/architecture.svg" width="24" height="24" alt=""> Architecture
 
-The REPL parses input and dispatches through a shared command registry. Commands
-receive a configuration containing the API client, collection, output writer,
-random source, and optional save function. Those boundaries allow command tests
-to control network responses and catch outcomes.
+The same Go binary runs the CLI and serves the companion. Typed PokéAPI responses
+pass through a bounded cache; catches are stored as versioned local JSON. The web
+view reads that collection and filters records locally, without an external service.
 
-- [repl.go](repl.go): input normalization, argument validation, and dispatch.
-- [commands.go](commands.go): pagination, exploration, catching, and collection display.
-- [internal/pokeapi](internal/pokeapi): bounded HTTP requests and typed JSON responses.
-- [internal/pokecache](internal/pokecache): synchronized byte cache and expiry worker.
-- [storage.go](storage.go): bounded loading and same-directory save replacement.
-- [storage_lock.go](storage_lock.go): cross-platform cooperating-writer locks.
-- [main.go](main.go): flags, dependency wiring, signal handling, and cleanup.
-
-The cache expires entries after five minutes and stores at most 256 responses or
-16 MiB of response bytes, excluding map/key overhead. Cache keys are limited to 4 KiB. Individual API responses are
-limited to 4 MiB. Cache reads return copies and reject expired entries immediately.
-Only successfully decoded and validated responses are cached.
+Read the [architecture guide](docs/ARCHITECTURE.md), [design system](DESIGN.md), and
+[interaction contract](UX-CONTRACT.md). Brand tokens live in one
+[identity file](internal/brand/identity.json) and generate the marks and palette adapters.
 
 ## <img src="readme-assets/icons/verification.svg" width="24" height="24" alt=""> Verification
 
@@ -159,45 +133,33 @@ go vet ./...
 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 ```
 
-Tests cover pagination boundaries, deterministic catch/escape outcomes, offline
-inspection, cache reuse and expiration, concurrent access, HTTP failure cases,
-timeouts, URL boundaries, invalid identifiers, save round trips, corruption, and
-exclusive writer locks, one-shot commands, automatic save directories, and batch error statuses. HTTP tests use local fixtures and do not require PokéAPI.
-
-[CI](.github/workflows/ci.yml) runs tests, vet, and builds on Linux, macOS, and
-Windows; its Linux security job checks reachable Go vulnerabilities and formatting.
-Local verification also included a live catch/save/restart session against PokéAPI.
-Native tests, vet, builds, and the security check have passed in [GitHub Actions](https://github.com/yaqyn/pokedex/actions/workflows/ci.yml).
-
-To create Linux, macOS, and Windows archives for amd64 and arm64:
+For web interaction tests, install the development-only Node dependencies:
 
 ```bash
-python3 scripts/release.py v1.0.0
+npm ci
+npm test
 ```
 
-Archives and `SHA256SUMS` appear in `dist/v1.0.0/`. This builds local artifacts and requires a clean Git tree;
-it does not publish a release. Python 3 is required only for this packaging step.
+Tests cover catch/escape outcomes, pagination, cached requests, malformed responses,
+timeouts, save recovery and locking, legacy-save discovery, plain CLI output,
+local web API boundaries, search, selection, empty states, and refresh failures.
+[CI](https://github.com/yaqyn/dexrove/actions/workflows/ci.yml) runs native Go checks
+on Linux, macOS, and Windows. See [release preparation](docs/RELEASE.md) for packaging.
 
 ## <img src="readme-assets/icons/security.svg" width="24" height="24" alt=""> Security and limitations
 
-- Production requests use HTTPS to a fixed PokéAPI origin. Redirects and pagination
-  URLs outside that origin/path are rejected.
-- Identifiers and displayed Pokemon fields are validated to reject terminal controls.
-- This is a single-user CLI. Saves are flushed before replacement and protected by
-  cooperating-writer locks. Unix uses atomic rename; Windows uses replacement moves
-  with write-through. This is not a backup or database durability guarantee.
-  Collections have no synchronization service or automatic backups.
-- Cache entries are session-local. New exploration and catch data depend on PokéAPI
-  availability; caught Pokemon can be inspected without network access.
-- Command history, battle simulation, and evolution are not implemented.
+- This is an independent, single-user Pokemon tool. There are no accounts, sync service, battle simulation, or automatic backups.
+- The companion binds to loopback only and rejects foreign hosts/origins. Its content policy allows bundled assets only; it has no write endpoint or third-party tracking.
+- Saves are validated, bounded to 4 MiB, flushed before replacement, and protected by cooperating-writer locks. This does not replace backups or a database durability guarantee.
+- API requests use HTTPS, explicit timeouts, response limits, and origin/path validation. Cache entries expire after five minutes and are bounded by count and response bytes.
+- Pokemon can escape. Records can be inspected offline after a successful catch; new world data depends on PokéAPI availability.
 
 ## <img src="readme-assets/icons/license.svg" width="24" height="24" alt=""> License
 
-The CLI is available under the [MIT license](LICENSE). Dependency licenses are
-included in [third-party notices](THIRD_PARTY_NOTICES.md). Pokemon names and game
-concepts belong to their respective owners. Data comes from [PokéAPI](https://pokeapi.co/).
+[MIT](LICENSE). Dependency and font licenses are included in
+[third-party notices](THIRD_PARTY_NOTICES.md). Pokemon names and concepts belong to
+their respective owners; data is provided by [PokéAPI](https://pokeapi.co/).
 
-> Built from Boot.dev's [Build a Pokedex in Go](https://www.boot.dev/courses/build-pokedex-cli-golang)
-> course, extended with automatic persistent saves, single-command and batch use,
-> bounded requests and caching, cross-platform locks, cancellation, failure tests,
-> and release packaging.
+> Based on Boot.dev's [Build a Pokedex in Go](https://www.boot.dev/courses/build-pokedex-cli-golang),
+> extended with persistent saves, scriptable commands, a local collection companion,
+> and the Dexrove identity.
