@@ -214,4 +214,19 @@ func TestGameMenusScrollAndCollectionWorksOffline(t *testing.T) {
 	if m.screen != "record" || api.calls != 0 {
 		t.Fatal("inspection made a network request")
 	}
+	gameKey(m, "esc")
+	if m.cursor != 80 || m.screen != "collection" {
+		t.Fatal("return did not restore the selected record", m.cursor)
+	}
+}
+
+func TestGameSmallScreenDoesNotActivateHiddenChoices(t *testing.T) {
+	m, api := gameForTest(t)
+	m.width = 20
+	if gameKey(m, "enter") != nil || api.calls != 0 {
+		t.Fatal("hidden choice was activated")
+	}
+	if gameKey(m, "q") == nil {
+		t.Fatal("small screen prevented quitting")
+	}
 }
