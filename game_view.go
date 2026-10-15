@@ -103,7 +103,7 @@ func (m *gameModel) sideLines(width int) []string {
 func (m *gameModel) View() tea.View {
 	width := max(1, m.width-4)
 	if m.width < 40 || m.height < 18 {
-		content := ansi.Hardwrap("Clibble >_\n\nYou need a little more room.\nResize to at least 40 columns and 18 rows.\n\nq: leave", max(1, m.width), false)
+		content := ansi.Hardwrap("Clibble >_\nResize to 40 × 18.\nq: leave", max(1, m.width), false)
 		lines := strings.Split(content, "\n")
 		if len(lines) > max(1, m.height) {
 			lines = lines[:max(1, m.height)]
@@ -174,16 +174,22 @@ func (m *gameModel) View() tea.View {
 	if m.screen == "record" || m.screen == "help" {
 		footer = "↑↓: scroll  Enter / Esc: back  q: leave"
 	}
+	if width < 70 {
+		footer = "↑↓  Enter: pick  Esc: back  q: quit"
+		if m.screen == "record" || m.screen == "help" {
+			footer = "↑↓: scroll  Esc: back  q: quit"
+		}
+	}
 	if m.busy {
-		footer = "You are on the trail…  Esc: cancel  q: leave"
+		footer = "Loading…  Esc: cancel  q: quit"
 		if m.pending == "catch" {
-			footer = "Your catch is settling…  q: leave safely"
+			footer = "Settling your catch… q: leave safely"
 		}
 	}
 	if m.problem != "" {
 		footer = "r: retry   Esc: back   q: leave"
 	}
-	if m.screen != "record" && m.screen != "help" {
+	if m.screen != "record" && m.screen != "help" && width >= 45 {
 		footer = fmt.Sprintf("%d/%d  ", m.cursor+1, len(m.choices())) + footer
 	}
 	lines = append(lines, footer)
