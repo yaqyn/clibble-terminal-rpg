@@ -134,26 +134,20 @@ func commandCatch(cfg *config, args ...string) error {
 		return nil
 	}
 	fmt.Fprintf(cfg.out, "Throwing a Pokeball at %s...\n", args[0])
-	pokemon, err := cfg.client.GetPokemon(cfg.ctx, args[0])
+	result, err := attemptCatch(cfg.ctx, cfg.client, cfg.pokedex, cfg.random, cfg.save, args[0])
 	if err != nil {
 		return err
 	}
-	if _, ok := cfg.pokedex[pokemon.Name]; ok {
-		fmt.Fprintf(cfg.out, "%s is already in your collection.\n", pokemon.Name)
+	if result.already {
+		fmt.Fprintf(cfg.out, "%s is already in your collection.\n", result.pokemon.Name)
 		return nil
 	}
-	if cfg.random() >= catchProbability(pokemon.BaseExperience) {
-		fmt.Fprintf(cfg.out, "%s escaped!\n", pokemon.Name)
+	if !result.caught {
+		fmt.Fprintf(cfg.out, "%s escaped!\n", result.pokemon.Name)
 		return nil
 	}
-	cfg.pokedex[pokemon.Name] = pokemon
-	if cfg.save != nil {
-		if err := cfg.save(cfg.pokedex); err != nil {
-			delete(cfg.pokedex, pokemon.Name)
-			return fmt.Errorf("save catch: %w", err)
-		}
-	}
-	fmt.Fprintf(cfg.out, "%s was caught!\nOpen its record with inspect <pokemon>.\n", pokemon.Name)
+	cfg.pokedex = result.owned
+	fmt.Fprintf(cfg.out, "%s was caught!\nOpen its record with inspect <pokemon>.\n", result.pokemon.Name)
 	return nil
 }
 func commandInspect(cfg *config, args ...string) error {
