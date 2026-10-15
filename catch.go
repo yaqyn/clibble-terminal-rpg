@@ -3,15 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 )
 
 type catchResult struct {
-	pokemon pokeapi.Pokemon
-	owned   map[string]pokeapi.Pokemon
-	caught  bool
-	already bool
+	progress gameProgress
+	pokemon  pokeapi.Pokemon
+	owned    map[string]pokeapi.Pokemon
+	caught   bool
+	already  bool
 }
 
 func copyCollection(source map[string]pokeapi.Pokemon) map[string]pokeapi.Pokemon {
@@ -24,9 +26,12 @@ func copyCollection(source map[string]pokeapi.Pokemon) map[string]pokeapi.Pokemo
 
 // attemptCatch works on a snapshot. Neither interface publishes a new catch
 // until its save succeeds, and background tasks never mutate the live collection.
-func attemptCatch(ctx context.Context, client pokemonAPI, owned map[string]pokeapi.Pokemon, random func() float64, save func(map[string]pokeapi.Pokemon) error, name string) (catchResult, error) {
+func attemptCatch(ctx context.Context, client pokemonAPI, owned map[string]pokeapi.Pokemon, random func() float64, save func(map[string]pokeapi.Pokemon, gameProgress) error, progress gameProgress, now time.Time, name string) (catchResult, error) {
 	if p, ok := owned[name]; ok {
 		return catchResult{pokemon: p, already: true}, nil
+	}
+	if err := progress.allowance(name, now); err != nil {
+		return catchResult{}, err
 	}
 	p, err := client.GetPokemon(ctx, name)
 	if err != nil {
@@ -38,15 +43,26 @@ func attemptCatch(ctx context.Context, client pokemonAPI, owned map[string]pokea
 	if err := ctx.Err(); err != nil {
 		return catchResult{}, err
 	}
-	if random() >= catchProbability(p.BaseExperience) {
-		return catchResult{pokemon: p}, nil
+	if err := progress.allowance(p.Name, now); err != nil {
+		return catchResult{}, err
 	}
+	budget := progress.refreshed(now)
+	budget.Balls--
+	encounter := budget.Encounters[p.Name]
+	if encounter.Until.IsZero() {
+		encounter.Until = now.Add(encounterWindow)
+	}
+	encounter.Throws++
+	budget.Encounters[p.Name] = encounter
 	next := copyCollection(owned)
-	next[p.Name] = p
+	caught := random() < catchProbability(p.BaseExperience)
+	if caught {
+		next[p.Name] = p
+	}
 	if save != nil {
-		if err := save(next); err != nil {
+		if err := save(next, budget); err != nil {
 			return catchResult{}, fmt.Errorf("save catch: %w", err)
 		}
 	}
-	return catchResult{pokemon: p, owned: next, caught: true}, nil
+	return catchResult{pokemon: p, owned: next, progress: budget, caught: caught}, nil
 }

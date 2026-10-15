@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 )
@@ -13,49 +14,79 @@ import (
 const maxSaveBytes = 4 << 20
 
 type diskPokedex struct {
-	Version int                        `json:"version"`
-	Pokemon map[string]pokeapi.Pokemon `json:"pokemon"`
+	Version  int                        `json:"version"`
+	Pokemon  map[string]pokeapi.Pokemon `json:"pokemon"`
+	Progress *gameProgress              `json:"progress,omitempty"`
 }
 
 func loadPokedex(path string) (map[string]pokeapi.Pokemon, error) {
+	p, _, err := loadGame(path)
+	return p, err
+}
+func loadGame(path string) (map[string]pokeapi.Pokemon, gameProgress, error) {
 	pokemon := make(map[string]pokeapi.Pokemon)
 	file, err := os.Open(path)
 	if os.IsNotExist(err) {
-		return pokemon, nil
+		return pokemon, freshProgress(time.Now()), nil
 	}
 	if err != nil {
-		return nil, err
+		return nil, gameProgress{}, err
 	}
 	defer file.Close()
 	data, err := io.ReadAll(io.LimitReader(file, maxSaveBytes+1))
 	if err != nil {
-		return nil, err
+		return nil, gameProgress{}, err
 	}
 	if len(data) > maxSaveBytes {
-		return nil, fmt.Errorf("save exceeds 4 MiB")
+		return nil, gameProgress{}, fmt.Errorf("save exceeds 4 MiB")
 	}
 	var saved diskPokedex
 	if err := json.Unmarshal(data, &saved); err != nil {
-		return nil, fmt.Errorf("invalid save: %w", err)
+		return nil, gameProgress{}, fmt.Errorf("invalid save: %w", err)
 	}
-	if saved.Version != 1 || saved.Pokemon == nil {
-		return nil, fmt.Errorf("unsupported or incomplete save")
+	if (saved.Version != 1 && saved.Version != 2) || saved.Pokemon == nil {
+		return nil, gameProgress{}, fmt.Errorf("unsupported or incomplete save")
 	}
 	for name, p := range saved.Pokemon {
 		if name != p.Name {
-			return nil, fmt.Errorf("save key does not match Pokemon name")
+			return nil, gameProgress{}, fmt.Errorf("save key does not match Pokemon name")
 		}
 		if err := pokeapi.ValidatePokemon(p); err != nil {
-			return nil, fmt.Errorf("invalid saved Pokemon: %w", err)
+			return nil, gameProgress{}, fmt.Errorf("invalid saved Pokemon: %w", err)
 		}
 	}
-	return saved.Pokemon, nil
+	progress := freshProgress(time.Now())
+	if saved.Version == 2 {
+		if saved.Progress == nil {
+			return nil, gameProgress{}, fmt.Errorf("missing game progress")
+		}
+		progress = *saved.Progress
+		if progress.Balls < 0 || progress.Balls > ballCapacity || progress.RefillAt.IsZero() || progress.Encounters == nil {
+			return nil, gameProgress{}, fmt.Errorf("invalid game progress")
+		}
+		for name, e := range progress.Encounters {
+			if name == "" || len(name) > 100 || e.Throws < 1 || e.Throws > 3 || e.Until.IsZero() {
+				return nil, gameProgress{}, fmt.Errorf("invalid encounter budget")
+			}
+		}
+	}
+	return saved.Pokemon, progress, nil
 }
 func savePokedex(path string, pokemon map[string]pokeapi.Pokemon) error {
 	data, err := json.MarshalIndent(diskPokedex{Version: 1, Pokemon: pokemon}, "", "  ")
 	if err != nil {
 		return err
 	}
+	return writeSave(path, data)
+}
+func saveGame(path string, pokemon map[string]pokeapi.Pokemon, progress gameProgress) error {
+	data, err := json.MarshalIndent(diskPokedex{Version: 2, Pokemon: pokemon, Progress: &progress}, "", "  ")
+	if err != nil {
+		return err
+	}
+	return writeSave(path, data)
+}
+func writeSave(path string, data []byte) error {
 	if len(data)+1 > maxSaveBytes {
 		return fmt.Errorf("save exceeds 4 MiB")
 	}

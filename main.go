@@ -41,6 +41,7 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 	port := flags.Int("port", 8787, "Local web companion port (serve only)")
 	colorMode := flags.String("color", "auto", "Terminal color: auto, always, or never")
 	showVersion := flags.Bool("version", false, "Print the build version")
+	noMotion := flags.Bool("no-motion", false, "Disable forest animation for this session")
 	dataPath := flags.String("data", "", "JSON save path (default: user configuration directory/clibble/collection.json)")
 	ephemeral := flags.Bool("ephemeral", false, "Use a temporary collection without loading or writing saves")
 	timeout := flags.Duration("timeout", 10*time.Second, "Maximum duration of each API request")
@@ -67,7 +68,7 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 	for i := range words {
 		words[i] = strings.ToLower(words[i])
 	}
-	cfg := &config{commands: getCommands(), ctx: ctx, out: out, errOut: errOut, prompt: interactive, batch: !interactive, pokedex: make(map[string]pokeapi.Pokemon), random: rand.Float64}
+	cfg := &config{noMotion: *noMotion, commands: getCommands(), ctx: ctx, out: out, errOut: errOut, prompt: interactive, batch: !interactive, pokedex: make(map[string]pokeapi.Pokemon), random: rand.Float64}
 	if interactive {
 		width := 80
 		color := *colorMode == "always"
@@ -135,11 +136,12 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 			return err
 		}
 		defer release()
-		cfg.pokedex, err = loadPokedex(path)
+		cfg.pokedex, cfg.progress, err = loadGame(path)
 		if err != nil {
 			return err
 		}
-		cfg.save = func(p map[string]pokeapi.Pokemon) error { return savePokedex(path, p) }
+		cfg.saveProgress = func(p map[string]pokeapi.Pokemon, progress gameProgress) error { return saveGame(path, p, progress) }
+		cfg.save = func(p map[string]pokeapi.Pokemon) error { return saveGame(path, p, cfg.progress.refreshed(cfg.now())) }
 	}
 	if len(words) > 0 {
 		err := execute(cfg, words)

@@ -99,9 +99,10 @@ func (m *gameModel) explore(name string) tea.Cmd {
 func (m *gameModel) throw() tea.Cmd {
 	name := m.selected
 	owned := copyCollection(m.cfg.pokedex)
+	progress, now := m.cfg.progress, m.cfg.now()
 	m.retry = m.throw
 	return m.request("catch", "You throw a Pokeball toward "+placeName(name)+". You watch it closely…", func(ctx context.Context) gameResult {
-		result, err := attemptCatch(ctx, m.cfg.client, owned, m.cfg.random, m.cfg.save, name)
+		result, err := attemptCatch(ctx, m.cfg.client, owned, m.cfg.random, m.cfg.persist, progress, now, name)
 		return gameResult{catch: result, err: err}
 	})
 }
@@ -272,6 +273,9 @@ func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "catch":
 			p := msg.catch.pokemon
+			if !msg.catch.already {
+				m.cfg.progress = msg.catch.progress
+			}
 			if msg.catch.caught {
 				m.cfg.pokedex = msg.catch.owned
 				m.narration = "You caught " + placeName(p.Name) + "! You add its record to your collection."
@@ -284,7 +288,7 @@ func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else if msg.catch.already {
 				m.narration = "You already have " + placeName(p.Name) + " in your collection. You can inspect its record."
 			} else {
-				m.narration = "You watch " + placeName(p.Name) + " slip free! You still have another chance. Will you try again?"
+				m.narration = "You watch " + placeName(p.Name) + " slip free! You check your remaining tries before approaching again."
 			}
 		}
 	case tea.KeyPressMsg:

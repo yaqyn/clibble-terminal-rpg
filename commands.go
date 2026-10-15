@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"time"
 
 	"github.com/yaqyn/clibble-pokemon-cli/internal/pokeapi"
 )
@@ -25,6 +26,11 @@ type pokemonAPI interface {
 	GetPokemon(context.Context, string) (pokeapi.Pokemon, error)
 }
 type config struct {
+	progress     gameProgress
+	clock        func() time.Time
+	saveProgress func(map[string]pokeapi.Pokemon, gameProgress) error
+	noMotion     bool
+
 	readLine func() (string, error)
 	view     *terminalView
 	errOut   io.Writer
@@ -134,7 +140,7 @@ func commandCatch(cfg *config, args ...string) error {
 		return nil
 	}
 	fmt.Fprintf(cfg.out, "Throwing a Pokeball at %s...\n", args[0])
-	result, err := attemptCatch(cfg.ctx, cfg.client, cfg.pokedex, cfg.random, cfg.save, args[0])
+	result, err := attemptCatch(cfg.ctx, cfg.client, cfg.pokedex, cfg.random, cfg.persist, cfg.progress, cfg.now(), args[0])
 	if err != nil {
 		return err
 	}
@@ -142,6 +148,8 @@ func commandCatch(cfg *config, args ...string) error {
 		fmt.Fprintf(cfg.out, "%s is already in your collection.\n", result.pokemon.Name)
 		return nil
 	}
+	cfg.progress = result.progress
+	fmt.Fprintf(cfg.out, "Pokeballs: %d/%d; tries left: %d/3\n", cfg.progress.Balls, ballCapacity, 3-cfg.progress.Encounters[result.pokemon.Name].Throws)
 	if !result.caught {
 		fmt.Fprintf(cfg.out, "%s escaped!\n", result.pokemon.Name)
 		return nil
