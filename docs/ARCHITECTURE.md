@@ -64,8 +64,9 @@ central panels and narration replace background cells, so scenery cannot hide
 text. Palette tokens come from `internal/brand/identity.json`.
 
 Bubble Tea schedules 12 ticks per second only while focused, colored, and motion
-is enabled. One timer chain is active at a time. `NO_COLOR` has a static character
-fallback; `-no-motion` overrides the saved preference for the session. No graphics
+is enabled. One timer chain is active at a time. Launching the RPG selects its
+palette even with inherited `NO_COLOR`; `-color never` has a static character
+fallback. Command mode still honors `NO_COLOR`; `-no-motion` overrides the saved preference for the session. No graphics
 protocol, external renderer, or image asset is needed. Output is bounded to
 320 columns by 120 rows; the minimum interactive screen is 40 by 18.
 

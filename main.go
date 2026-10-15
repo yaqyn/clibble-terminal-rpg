@@ -145,6 +145,9 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 		return err
 	}
 	if interactive && !*plain && supportsGame(in, out) {
+		// The game has an authored palette: launching it opts into its forest.
+		// Keep NO_COLOR for command output and an explicit escape hatch for play.
+		cfg.view.color = *colorMode != "never"
 		return runGame(cfg, in, out)
 	}
 	if cfg.view != nil {

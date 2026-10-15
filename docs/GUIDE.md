@@ -109,8 +109,10 @@ switches to a fullscreen display. On supported terminals, the line editor suppor
 Tab command completion, up/down history, cursor movement, and editing shortcuts.
 Its last 100 commands stay in memory only. Terminal settings are restored on exit. Narrow terminals use linear layouts.
 
-`-color never`, `NO_COLOR`, or `TERM=dumb` disables automatic color. The explicit
-`always` option is only for interactive presentation; redirected results stay plain.
+`clibble` opens the colored forest directly. Use `-color never` for a static,
+color-free RPG. Command mode honors `NO_COLOR`; `TERM=dumb` uses command mode.
+The explicit `always` option is only for interactive presentation; redirected
+results stay plain.
 
 ```bash
 clibble -plain -color never

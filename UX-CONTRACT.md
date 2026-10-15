@@ -51,8 +51,8 @@ There are no payments, accounts, deletion actions, or permission settings.
 ## Modes and accessibility
 
 The RPG screen is fully keyboard operated, resizes without hiding selection, and
-restores the normal terminal on exit. `-plain` and script output stay linear; color is optional and disabled by NO_COLOR, dumb
-terminals, or the explicit never mode. Pipes have no banner, colors, or prompts.
+restores the normal terminal on exit. `-plain` and script output stay linear; the RPG opens in color unless `-color never` is selected. Command output honors
+NO_COLOR and dumb terminals. Pipes have no banner, colors, or prompts.
 Web inputs have labels, controls are native buttons, selection uses aria-pressed,
 and status uses an aria-live region. Details are a section with a named heading.
 No modal, custom listbox, toast, or gesture-only interaction is used. All content

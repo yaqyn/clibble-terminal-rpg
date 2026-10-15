@@ -70,8 +70,9 @@ to 12. API/data errors and failed saves spend nothing.
 
 The green pixel forest has gentle rain, canopy movement, and drifting motes at
 12 fps. Choose **Forest settings → Motion: off** to save a still-forest preference,
-or launch with `-no-motion` for this session. `NO_COLOR` uses a static character
-backdrop; `-plain` keeps the linear prompt.
+or launch with `-no-motion` for this session. `./clibble` opens the colored forest directly, even when `NO_COLOR` is inherited.
+Use `-color never` for a static character backdrop. `-plain` keeps the linear
+prompt and honors `NO_COLOR`.
 
 For the command prompt, use `./clibble -plain`. It keeps grouped help, Tab command
 completion, and the last 100 commands in memory. Scripts and one-shot commands

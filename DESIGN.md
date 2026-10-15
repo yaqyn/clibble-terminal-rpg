@@ -79,7 +79,8 @@ narration addresses the player as you. Procedural half-block pixel scenery frame
 centered menus, with a low-detail clearing behind text. Sparse drizzle, canopy
 shimmer, and motes animate at 12 fps without changing gameplay. Focus loss stops
 ticks; a saved Motion setting or session `-no-motion` flag makes the scene still.
-NO_COLOR uses a static character backdrop. At 40 × 18 the same actions and
+Launching the RPG opts into the forest palette even when NO_COLOR is inherited;
+`-color never` uses a static character backdrop. Command mode honors NO_COLOR. At 40 × 18 the same actions and
 narration stay available; below that, show a resize hint and allow safe exit.
 Long lists and records scroll; returning restores the prior selected item.
 Long narration and errors have a visible Tab continuation hint and message pages.
