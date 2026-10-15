@@ -2,14 +2,15 @@
 
 ## Sources and canonical owners
 
-| Capability | Owner | Source | Verification |
-| --- | --- | --- | --- |
-| Command dispatch | repl.go | Existing CLI command/argument contracts | repl_test.go, cli_test.go |
-| Save lifecycle | storage.go, storage_lock.go | Version-1 JSON format and single writer | storage_test.go |
-| Terminal presentation | presentation.go | DESIGN.md and brand identity | presentation_test.go |
-| Local collection API | companion.go | Read-only saved collection | companion_test.go |
-| Search and selection | internal/webui/assets/app.js | Local array filtering and selected creature | Browser and static checks |
-| Scrollbar and focus | internal/webui/assets/styles.css | DESIGN.md | Browser and static checks |
+| Capability | Canonical owner | Source of truth | Allowed variants | Verification |
+| --- | --- | --- | --- | --- |
+| Command dispatch | repl.go | Existing CLI command contract | interactive / one-shot / batch | repl_test.go, cli_test.go |
+| Save lifecycle | storage.go | Version-1 collection schema | default / custom / legacy | storage_test.go, presentation_test.go |
+| Terminal presentation | presentation.go | DESIGN.md | narrow / wide / plain | presentation_test.go |
+| Collection API | companion.go | Read-only local save | empty / populated / unavailable | companion_test.go |
+| Search and selection | internal/webui/assets/app.js | UX-CONTRACT.md | filtered / empty / selected | tests/companion.test.mjs |
+| Scrollbar | internal/webui/assets/styles.css | DESIGN.md | normal / forced-colors | browser and static checks |
+
 
 The app is single-user. The web companion binds to loopback, rejects foreign Host
 and Origin headers, and provides no write endpoint. It reads the same version-1

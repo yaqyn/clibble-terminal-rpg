@@ -22,11 +22,13 @@ spacing:
   page-max: "76rem"
 components:
   navigation:
-    treatment: "Small wordmark, collection navigation, quiet local-status text"
+    backgroundColor: "{colors.background}"
+    textColor: "{colors.text}"
   creature-record:
-    treatment: "Name, labeled types, measured attributes, and comparable stats"
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.text}"
   terminal:
-    treatment: "Short headings, grouped commands, and linear readable output"
+    textColor: "{colors.terminal-accent}"
 ---
 
 # Dexrove design system

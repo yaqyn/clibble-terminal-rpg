@@ -57,7 +57,7 @@ func (v *terminalView) help() {
 	fmt.Fprintln(v.out, "\nBrowse saved records in a browser: dexrove serve\nThe pokedex command remains an alias for collection.")
 }
 func (v *terminalView) inspect(p pokeapi.Pokemon) {
-	v.title(strings.ToUpper(p.Name))
+	v.title(p.Name)
 	types := make([]string, 0, len(p.Types))
 	for _, kind := range p.Types {
 		types = append(types, kind.Type.Name)

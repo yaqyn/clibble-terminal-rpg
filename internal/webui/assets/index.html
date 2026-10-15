@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Browse your Dexrove Pokemon collection locally."
+    />
+    <title>Dexrove — Your collection</title>
+    <link rel="icon" href="/mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/tokens.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#collection">Skip to your collection</a>
+    <header class="topbar">
+      <a class="wordmark" href="/" aria-label="Dexrove home"
+        ><img src="/mark.svg" width="36" height="36" alt="" />Dexrove</a
+      ><span class="local-label">Your local field guide</span>
+    </header>
+    <main>
+      <noscript
+        ><p>
+          The local collection view needs JavaScript. You can still read your
+          collection with <code>dexrove collection</code>.
+        </p></noscript
+      >
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <h1 id="page-title">Keep what you discover.</h1>
+          <p>
+            Every catch has a place here. Open a record, compare its strengths,
+            and plan your next discovery.
+          </p>
+        </div>
+        <button id="refresh" class="refresh" type="button" disabled>
+          Refresh collection
+        </button>
+      </section>
+      <p id="status" class="status" role="status" aria-live="polite">
+        Opening your collection…
+      </p>
+      <section
+        class="workspace"
+        id="collection"
+        aria-labelledby="collection-title"
+      >
+        <div class="collection-index">
+          <div class="section-heading">
+            <h2 id="collection-title">Your collection</h2>
+            <span id="count">—</span>
+          </div>
+          <label for="search">Search a name or type</label>
+          <div class="search-control">
+            <input
+              id="search"
+              type="search"
+              placeholder="Try pidgey or flying"
+              autocomplete="off"
+              disabled
+            /><button id="clear" type="button" hidden disabled>Clear</button>
+          </div>
+          <div id="records" class="records" aria-label="Caught Pokemon"></div>
+          <button id="more" class="more" type="button" hidden disabled>
+            Show more
+          </button>
+          <div id="empty" class="empty" hidden>
+            <img src="/mark.svg" width="48" height="48" alt="" />
+            <h3 id="empty-title">A new trail starts here.</h3>
+            <p id="empty-copy">
+              Catch your first Pokemon in the terminal, then refresh this page.
+            </p>
+            <code>dexrove catch pidgey</code>
+          </div>
+        </div>
+        <section
+          class="field-record"
+          id="detail"
+          aria-labelledby="record-title"
+        >
+          <div class="record-placeholder">
+            <img src="/mark.svg" width="72" height="72" alt="" />
+            <h2 id="record-title">A closer look.</h2>
+            <p>Choose a Pokemon to open its field record.</p>
+          </div>
+        </section>
+      </section>
+      <footer>
+        <p>Explore. Catch. Keep.</p>
+        <p>
+          Read-only view. Catch in the CLI, then refresh here. Your collection
+          stays on this device.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

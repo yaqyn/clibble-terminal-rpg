@@ -9,3 +9,7 @@
 /dist/
 
 __pycache__/
+
+/dexrove
+/dexrove.exe
+/node_modules/

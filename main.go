@@ -37,6 +37,7 @@ func run() error {
 func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Writer, interactive bool) error {
 	flags := flag.NewFlagSet(brand.Get().Slug, flag.ContinueOnError)
 	flags.SetOutput(errOut)
+	port := flags.Int("port", 8787, "Local web companion port (serve only)")
 	colorMode := flags.String("color", "auto", "Terminal color: auto, always, or never")
 	showVersion := flags.Bool("version", false, "Print the build version")
 	dataPath := flags.String("data", "", "JSON save path (default: user configuration directory/dexrove/collection.json)")
@@ -79,6 +80,22 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 			}
 		}
 		cfg.view = &terminalView{out: out, color: color, width: width}
+	}
+	if len(words) > 0 && words[0] == "serve" {
+		if len(words) != 1 {
+			return fmt.Errorf("Usage: dexrove [flags] serve")
+		}
+		if *ephemeral {
+			return fmt.Errorf("serve reads saved collections; omit -ephemeral")
+		}
+		path, err := collectionPath(*dataPath)
+		if err != nil {
+			return err
+		}
+		return serveCompanion(ctx, path, *port, out)
+	}
+	if _, noColor := os.LookupEnv("NO_COLOR"); noColor && cfg.view != nil {
+		cfg.view.color = false
 	}
 	// Help and malformed one-shot commands should not create or lock save files.
 	if len(words) > 0 {

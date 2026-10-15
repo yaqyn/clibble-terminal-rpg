@@ -1,0 +1,14 @@
+{
+  "profile": "product-admin",
+  "sourceRoots": ["internal/webui/assets"],
+  "locale": "en",
+  "canonicalMap": "UX-CONTRACT.md",
+  "requiredCapabilities": [],
+  "requiredCommands": ["unit", "build", "javascript"],
+  "commands": {
+    "unit": "go test -race ./...",
+    "build": "go build -trimpath -o dexrove .",
+    "javascript": "node --check internal/webui/assets/app.js"
+  },
+  "evidence": { "failurePaths": "companion_test.go" }
+}

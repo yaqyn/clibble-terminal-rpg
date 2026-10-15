@@ -69,6 +69,7 @@ func commandHelp(cfg *config, args ...string) error {
 		cmd := cfg.commands[key]
 		fmt.Fprintf(cfg.out, "%s: %s\n", cmd.name, cmd.description)
 	}
+	fmt.Fprintln(cfg.out, "\nserve: Open the local collection companion (dexrove serve)")
 	return nil
 }
 func sortedKeys[V any](values map[string]V) []string {
