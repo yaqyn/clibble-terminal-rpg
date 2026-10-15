@@ -61,12 +61,15 @@ type gameModel struct {
 	requestID                           int
 	cancel                              context.CancelFunc
 	retry                               func() tea.Cmd
+	scene                               forestScene
+	frame                               int
+	focused, ticking                    bool
 }
 
 func newGame(cfg *config, tasks *gameTasks) *gameModel {
-	return &gameModel{cfg: cfg, tasks: tasks, screen: "camp", width: 80, height: 24, narration: "You stand at the trailhead. Somewhere beyond the tall grass, your next catch is waiting. Where will you go?"}
+	return &gameModel{focused: true, cfg: cfg, tasks: tasks, screen: "title", width: 80, height: 24, narration: "You stand at the trailhead. Somewhere beyond the tall grass, your next catch is waiting. Where will you go?"}
 }
-func (m *gameModel) Init() tea.Cmd { return nil }
+func (m *gameModel) Init() tea.Cmd { return m.animate() }
 func (m *gameModel) request(kind, message string, work func(context.Context) gameResult) tea.Cmd {
 	if m.cancel != nil {
 		m.cancel()
@@ -101,7 +104,7 @@ func (m *gameModel) throw() tea.Cmd {
 	owned := copyCollection(m.cfg.pokedex)
 	progress, now := m.cfg.progress, m.cfg.now()
 	m.retry = m.throw
-	return m.request("catch", "You throw a Pokeball toward "+placeName(name)+". You watch it closely…", func(ctx context.Context) gameResult {
+	return m.request("catch", "You offer a catch seed to "+placeName(name)+". You watch it closely…", func(ctx context.Context) gameResult {
 		result, err := attemptCatch(ctx, m.cfg.client, owned, m.cfg.random, m.cfg.persist, progress, now, name)
 		return gameResult{catch: result, err: err}
 	})
@@ -123,26 +126,34 @@ func (m *gameModel) back() {
 		m.move(m.recordFrom, "You close the field record. What will you do next?")
 		m.cursor = m.recordCursor
 	case "encounter":
-		m.move("area", "You return to the grass. You look for another Pokemon.")
+		m.move("area", "You return to the grass. You look for another wildling.")
 		m.cursor = m.areaCursor
 	default:
 		m.camp()
 	}
 }
 func (m *gameModel) openCollection() {
-	m.move("collection", fmt.Sprintf("You open your collection. You have caught %d distinct Pokemon.", len(m.cfg.pokedex)))
+	m.move("collection", fmt.Sprintf("You open your collection. You have caught %d distinct wildling.", len(m.cfg.pokedex)))
 	if len(m.cfg.pokedex) == 0 {
-		m.narration = "Your collection is waiting for its first story. Travel to a location and choose a Pokemon to catch."
+		m.narration = "Your collection is waiting for its first story. Travel to a location and choose a wildling to catch."
 	}
 }
 func (m *gameModel) choices() []gameChoice {
 	switch m.screen {
+	case "title":
+		return []gameChoice{{"start", "Start exploring", "Step into Mosslight Woods"}, {"collection", "Field journal", "Read your saved stories"}, {"settings", "Forest settings", "Choose a still or moving forest"}, {"quit", "Leave", "Return another day"}}
+	case "settings":
+		label := "Motion: on"
+		if m.cfg.progress.MotionOff {
+			label = "Motion: off"
+		}
+		return []gameChoice{{"motion", label, "Toggle rain, wind and drifting particles"}, {"back", "Return to trailhead", "Keep exploring"}}
 	case "camp":
 		leave := gameChoice{"quit", "Save and leave", "Your successful catches are already saved"}
 		if m.cfg.save == nil {
 			leave = gameChoice{"quit", "Leave this trail", "Your temporary collection ends with this session"}
 		}
-		return []gameChoice{{"travel", "Travel", "Choose a location to visit"}, {"collection", "Your collection", "Inspect the Pokemon you have caught"}, {"help", "Field guide", "Learn the controls and catch rules"}, leave}
+		return []gameChoice{{"travel", "Travel", "Choose a location to visit"}, {"collection", "Field journal", "Inspect the wildling you have caught"}, {"help", "Field guide", "Learn the controls and catch rules"}, {"settings", "Forest settings", "Choose whether the forest moves"}, leave}
 	case "travel":
 		choices := make([]gameChoice, 0, len(m.locations.Results)+3)
 		for _, area := range m.locations.Results {
@@ -162,14 +173,14 @@ func (m *gameModel) choices() []gameChoice {
 			if _, ok := m.cfg.pokedex[name]; ok {
 				label += " [caught]"
 			}
-			choices = append(choices, gameChoice{name, label, "Enter to approach this Pokemon"})
+			choices = append(choices, gameChoice{name, label, "Enter to approach this wildling"})
 		}
 		return append(choices, gameChoice{"explore", "Explore again", "Look around this location again"}, gameChoice{"travel", "Travel onward", "Open your map"}, gameChoice{"back", "Return to trailhead", "Take a moment to plan"})
 	case "encounter":
 		if _, ok := m.cfg.pokedex[m.selected]; ok {
-			return []gameChoice{{"inspect", "Inspect your catch", "Read its saved field record"}, {"back", "Return to the grass", "Look for another Pokemon"}, {"collection", "Your collection", "Browse your caught Pokemon"}}
+			return []gameChoice{{"inspect", "Inspect your catch", "Read its saved field record"}, {"back", "Return to the grass", "Look for another wildling"}, {"collection", "Field journal", "Browse your caught wildling"}}
 		}
-		return []gameChoice{{"throw", "Throw a Pokeball", "Attempt a catch; some Pokemon may escape"}, {"back", "Return to the grass", "Leave this encounter"}}
+		return []gameChoice{{"throw", "Offer a catch seed", "Attempt a catch; some wildling may escape"}, {"back", "Return to the grass", "Leave this encounter"}}
 	case "collection":
 		choices := make([]gameChoice, 0, len(m.cfg.pokedex)+1)
 		for _, name := range sortedKeys(m.cfg.pokedex) {
@@ -187,6 +198,19 @@ func (m *gameModel) choose() tea.Cmd {
 	}
 	choice := choices[m.cursor]
 	switch choice.id {
+	case "start":
+		m.camp()
+	case "settings":
+		m.move("settings", "You take a breath. Choose a still forest or gentle rain, wind and drifting motes.")
+	case "motion":
+		p := m.cfg.progress.refreshed(m.cfg.now())
+		p.MotionOff = !p.MotionOff
+		owned := copyCollection(m.cfg.pokedex)
+		m.retry = m.choose
+		return m.request("settings", "You settle into the forest…", func(context.Context) gameResult {
+			err := m.cfg.persist(owned, p)
+			return gameResult{catch: catchResult{progress: p}, err: err}
+		})
 	case "quit":
 		return tea.Quit
 	case "back":
@@ -230,6 +254,17 @@ func (m *gameModel) choose() tea.Cmd {
 }
 func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case forestTick:
+		m.ticking = false
+		if m.animated() {
+			m.frame++
+			return m, m.animate()
+		}
+	case tea.BlurMsg:
+		m.focused = false
+	case tea.FocusMsg:
+		m.focused = true
+		return m, m.animate()
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
@@ -250,6 +285,10 @@ func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		switch msg.kind {
+		case "settings":
+			m.cfg.progress = msg.catch.progress
+			m.narration = "You choose how the forest feels. Your preference is saved."
+			return m, m.animate()
 		case "travel":
 			m.locations = msg.locations
 			m.move("travel", "You trace the paths on your map. Choose where you want to travel.")
@@ -267,9 +306,9 @@ func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					seen[e.Pokemon.Name] = true
 				}
 			}
-			m.move("area", "You step into "+placeName(m.location)+". You notice movement in the grass. Choose a Pokemon to approach.")
+			m.move("area", "You step into "+placeName(m.location)+". You notice movement in the grass. Choose a wildling to approach.")
 			if len(m.encounters) == 0 {
-				m.narration = "You look around " + placeName(m.location) + ". You find no Pokemon here. You can explore again or travel onward."
+				m.narration = "You look around " + placeName(m.location) + ". You find no wildling here. You can explore again or travel onward."
 			}
 		case "catch":
 			p := msg.catch.pokemon
@@ -300,7 +339,7 @@ func (m *gameModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		if m.busy {
-			if key == "esc" && m.pending != "catch" {
+			if key == "esc" && m.pending != "catch" && m.pending != "settings" {
 				if m.cancel != nil {
 					m.cancel()
 				}

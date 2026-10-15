@@ -2,14 +2,13 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/x/ansi"
 )
 
-func (m *gameModel) bodyRows() int { return max(4, m.height-13) }
+func (m *gameModel) bodyRows() int { return max(4, min(m.height, 120)-13) }
 func (m *gameModel) storyLines() []string {
 	story := m.narration
 	if m.problem != "" {
@@ -20,6 +19,10 @@ func (m *gameModel) storyLines() []string {
 func (m *gameModel) storyPages() int { return max(1, (len(m.storyLines())+2)/3) }
 func (m *gameModel) heading() string {
 	switch m.screen {
+	case "title":
+		return "Clibble"
+	case "settings":
+		return "Your forest"
 	case "travel":
 		return "Your map"
 	case "area":
@@ -27,7 +30,7 @@ func (m *gameModel) heading() string {
 	case "encounter":
 		return "You encounter " + placeName(m.selected)
 	case "collection":
-		return "Your collection"
+		return "Your field journal"
 	case "record":
 		return placeName(m.record.Name) + " / Field record"
 	case "help":
@@ -76,11 +79,11 @@ func (m *gameModel) recordLines() []string {
 }
 func (m *gameModel) sideLines(width int) []string {
 	if m.screen == "help" {
-		return strings.Split("You choose your own pace.\n\nUp/down or j/k: move\nEnter or Space: choose\nEsc or Backspace: go back\nt: travel   c: collection\nLeft/right: map pages\nr: retry a failed action\nq or Ctrl+C: leave\n\nStronger Pokemon escape more often.\nYour successful catches save at once.\nTravel position lasts this session.", "\n")
+		return strings.Split("You choose your own pace.\n\nUp/down or j/k: move\nEnter or Space: choose\nEsc or Backspace: go back\nt: travel   c: collection\nLeft/right: map pages\nr: retry a failed action\nq or Ctrl+C: leave\n\nStronger wildling escape more often.\nEach offer uses one seed and one try.\nThree tries per wildling / 30 minutes.\nSeeds refill: one / 5 minutes, up to 12.\nForest settings can turn motion off.\nTravel position lasts this session.", "\n")
 	}
 	if m.screen == "collection" {
 		if len(m.cfg.pokedex) == 0 {
-			return strings.Split("Your first catch is still out there.\n\nChoose Travel from the trailhead,\nvisit a location, and approach\na Pokemon in the grass.", "\n")
+			return strings.Split("Your first catch is still out there.\n\nChoose Travel from the trailhead,\nvisit a location, and approach\na wildling in the grass.", "\n")
 		}
 		choices := m.choices()
 		if m.cursor < len(choices) && choices[m.cursor].id != "back" {
@@ -101,111 +104,11 @@ func (m *gameModel) sideLines(width int) []string {
 	}
 	if m.screen == "encounter" {
 		if _, ok := m.cfg.pokedex[m.selected]; ok {
-			art = append(art, "", "You have caught this Pokemon.")
+			art = append(art, "", "You have caught this wildling.")
 		} else {
-			art = append(art, "", "You have not caught this Pokemon yet.")
+			art = append(art, "", "You have not caught this wildling yet.")
 		}
 	}
 	return art
 }
-func (m *gameModel) View() tea.View {
-	width := max(1, m.width-4)
-	if m.width < 40 || m.height < 18 {
-		content := ansi.Hardwrap("Clibble >_\nResize to 40 × 18.\nq: leave", max(1, m.width), false)
-		lines := strings.Split(content, "\n")
-		if len(lines) > max(1, m.height) {
-			lines = lines[:max(1, m.height)]
-		}
-		v := tea.NewView(strings.Join(lines, "\n"))
-		v.AltScreen = true
-		return v
-	}
-	saveMode := "Auto-saved"
-	if m.cfg.save == nil {
-		saveMode = "Temporary session"
-	}
-	lines := []string{m.ink("Clibble >_") + "   A little wild in your terminal.", fmt.Sprintf("%d caught  /  %s", len(m.cfg.pokedex), saveMode), m.ink(m.heading()), strings.Repeat("─", width)}
-	rows := m.bodyRows()
-	if m.screen == "record" || m.screen == "help" {
-		record := m.detailLines()
-		mOffset := min(m.detailOffset, max(0, len(record)-rows))
-		for i := 0; i < rows; i++ {
-			line := ""
-			if i+mOffset < len(record) {
-				line = record[i+mOffset]
-			}
-			lines = append(lines, ansi.Truncate(line, width, "…"))
-		}
-	} else {
-		menuWidth := width
-		wide := width >= 84
-		if wide {
-			menuWidth = width/2 - 2
-		}
-		menu := m.menuLines(menuWidth, rows)
-		side := m.sideLines(width - menuWidth - 4)
-
-		for i := 0; i < rows; i++ {
-			left := ""
-			if i < len(menu) {
-				left = menu[i]
-			}
-			if wide {
-				right := ""
-				if i < len(side) {
-					right = ansi.Truncate(side[i], width-menuWidth-4, "…")
-				}
-				left += strings.Repeat(" ", max(0, menuWidth-ansi.StringWidth(left))) + "  │ " + right
-			}
-			lines = append(lines, left)
-		}
-	}
-	wrapped := m.storyLines()
-	page := m.storyPage % m.storyPages()
-	lines = append(lines, "┌"+strings.Repeat("─", width-2)+"┐")
-	for i := 0; i < 3; i++ {
-		s := ""
-		if i+page*3 < len(wrapped) {
-			s = wrapped[i+page*3]
-		}
-		s = ansi.Truncate(s, width-4, "…")
-		lines = append(lines, "│ "+s+strings.Repeat(" ", max(0, width-4-ansi.StringWidth(s)))+" │")
-	}
-	lines = append(lines, "└"+strings.Repeat("─", width-2)+"┘")
-	if m.storyPages() > 1 {
-		lines = append(lines, fmt.Sprintf("Tab: read more (%d/%d)", page+1, m.storyPages()))
-	}
-	footer := "↑↓ / j k: move   Enter: choose   Esc: back   q: leave"
-	if m.screen == "travel" {
-		footer = "↑↓: choose  Enter: travel  ←→: pages  Esc: back  q: leave"
-	}
-	if m.screen == "record" || m.screen == "help" {
-		footer = "↑↓: scroll  Enter / Esc: back  q: leave"
-	}
-	if width < 70 {
-		footer = "↑↓  Enter: pick  Esc: back  q: quit"
-		if m.screen == "record" || m.screen == "help" {
-			footer = "↑↓: scroll  Esc: back  q: quit"
-		}
-	}
-	if m.busy {
-		footer = "Loading…  Esc: cancel  q: quit"
-		if m.pending == "catch" {
-			footer = "Settling your catch… q: leave safely"
-		}
-	}
-	if m.problem != "" {
-		footer = "r: retry   Esc: back   q: leave"
-	}
-	if m.screen != "record" && m.screen != "help" && width >= 45 {
-		footer = fmt.Sprintf("%d/%d  ", m.cursor+1, len(m.choices())) + footer
-	}
-	lines = append(lines, footer)
-	for i, line := range lines {
-		lines[i] = "  " + ansi.Truncate(line, width, "…")
-	}
-	v := tea.NewView(strings.Join(lines, "\n"))
-	v.AltScreen = true
-	// Preserve the user's terminal background and font. NO_COLOR controls accents.
-	return v
-}
+func (m *gameModel) View() tea.View { return m.forestView() }

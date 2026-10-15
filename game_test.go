@@ -31,7 +31,9 @@ func gameForTest(t *testing.T) (*gameModel, *trailAPI) {
 	cfg.client = api
 	tasks := newGameTasks(cfg.ctx)
 	t.Cleanup(tasks.close)
-	return newGame(cfg, tasks), api
+	m := newGame(cfg, tasks)
+	m.screen = "camp"
+	return m, api
 }
 func gameKey(m *gameModel, key string) tea.Cmd {
 	code := rune(0)
