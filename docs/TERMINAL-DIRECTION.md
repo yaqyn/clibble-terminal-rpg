@@ -1,3 +1,8 @@
+> Implemented: the rainy forest direction now runs in the Go RPG. Clibble also
+> has an original offline world: wildlings and catch seeds replace the earlier
+> course terminology. Current rules and controls live in [GUIDE.md](GUIDE.md);
+> this document preserves the design research and alternatives below.
+
 # Clibble: centered forest terminal research
 
 Status: design proposal, not implemented game behavior. The current released

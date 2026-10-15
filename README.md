@@ -1,30 +1,32 @@
-![Clibble — A little wild in your terminal.](readme-assets/cover.webp)
+![Clibble — A little wild in your terminal.](readme-assets/cover-original-world.webp)
 
-# Clibble — a terminal Pokémon adventure
+# Clibble — a little wilderness RPG in your terminal
 
-Explore Pokémon locations, try your luck at a catch, and keep a collection on your device.
+Explore a rain-soaked forest, meet wildlings, and fill a field journal of your own.
 
 Clibble brings an arrow-driven adventure to your terminal. Travel between locations,
 inspect your catches offline, or browse saved records in the optional, read-only web companion.
-Exploration uses PokéAPI; saved catches stay local and require no account or API key.
+Six trails and ten original wildlings are bundled into the app. Play offline, with no account or API key.
 
-[Download the CLI](https://github.com/yaqyn/clibble-pokemon-cli/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
+[Published releases](https://github.com/yaqyn/clibble-pokemon-cli/releases/latest) · [Start from source](#-installation) · [User guide](docs/GUIDE.md)
 
 ## <img src="readme-assets/icons/features.svg" width="24" height="24" alt=""> Features
 
 - **Play in the terminal.** Choose with arrows and Enter, follow the narration, and inspect your catches.
-- **Follow a new trail.** Browse location areas and discover the Pokemon that live there.
+- **Follow a new trail.** Browse forest trails and discover the wildlings that live there.
 - **Make the catch.** Try your luck, save successful catches, and return to their records offline.
-- **See your collection.** Search by name or type in the read-only web companion; compare stats and measurements.
+- **See your collection.** Search by name or habitat in the read-only web companion; compare stats and measurements.
 - **Use it your way.** Run one-shot commands or pipe a batch; local saves keep your collection between sessions.
 
 ## <img src="readme-assets/icons/installation.svg" width="24" height="24" alt=""> Installation
 
-Download the archive for your operating system and architecture from the
+The original-world forest build is currently available from source. Published
+v1.x archives predate this redesign. For those older versions, download the archive
+for your operating system and architecture from the
 [releases page](https://github.com/yaqyn/clibble-pokemon-cli/releases/latest), verify it against
 `SHA256SUMS`, and extract it. Run `clibble` on Linux/macOS or `clibble.exe` on Windows.
 The compiled app includes the web interface and font; it needs no Go, Node, or Python runtime.
-New exploration and catch data require internet access to PokéAPI.
+The world, terminal scenery, companion, and font are bundled. Playing requires no internet connection.
 
 To build from source, install the Go version declared in [go.mod](go.mod) or newer:
 
@@ -42,8 +44,8 @@ On Windows, use `-o clibble.exe`. Go downloads pinned build dependencies on the 
 ./clibble
 ```
 
-You arrive at the trailhead. Choose **Travel**, select a destination, then approach
-a Pokemon and choose **Throw a Pokeball**. After a successful catch, choose
+Choose **Start exploring**, then **Travel**. Visit Mosslight Woods, approach
+a wildling, and choose **Offer a catch seed**. After a successful catch, choose
 **Inspect your catch** to open its saved record. Your catches save automatically.
 
 | Key | Action |
@@ -59,7 +61,17 @@ a Pokemon and choose **Throw a Pokeball**. After a successful catch, choose
 
 The RPG screen needs a terminal at least 40 columns × 18 rows. It adapts to resizing
 and restores your terminal when you leave. Location and menu position last for the
-session; your caught Pokemon remain saved. Catches can escape; you can try again.
+session; your journal, supplies, encounter tries, and motion preference remain saved.
+
+You begin with **12 catch seeds**. Each resolved offer costs one seed and one try,
+including escapes. You get **three tries per wildling in a 30-minute window**,
+shared across trails and restarts. One seed replenishes every five minutes, up
+to 12. API/data errors and failed saves spend nothing.
+
+The green pixel forest has gentle rain, canopy movement, and drifting motes at
+12 fps. Choose **Forest settings → Motion: off** to save a still-forest preference,
+or launch with `-no-motion` for this session. `NO_COLOR` uses a static character
+backdrop; `-plain` keeps the linear prompt.
 
 For the command prompt, use `./clibble -plain`. It keeps grouped help, Tab command
 completion, and the last 100 commands in memory. Scripts and one-shot commands
@@ -71,19 +83,18 @@ continue to work directly.
 | --- | --- |
 | `help` | Show the field guide |
 | `map` / `mapb` | Browse the next / previous page of location areas |
-| `explore <area>` | List Pokemon in a location area |
-| `catch <pokemon>` | Attempt a catch; higher base experience lowers the chance |
-| `inspect <pokemon>` | Read a caught Pokemon's record without a network request |
-| `collection` | List your caught Pokemon |
-| `count` | Print the number of distinct caught Pokemon offline |
+| `explore <area>` | List wildlings in a location area |
+| `catch <wildling>` | Attempt a catch; shyer wildlings are harder to catch |
+| `inspect <wildling>` | Read a caught wildling's record without a network request |
+| `collection` | List your caught wildlings |
+| `count` | Print the number of distinct caught wildlings offline |
 | `serve` | Start the local web companion; run this from your shell |
 | `exit` | Leave the interactive session |
 
-Commands and identifiers are case-insensitive. The original `pokedex` command
-remains an alias for `collection`. Use single commands or pipe a batch:
+Commands and identifiers are case-insensitive. `collection` opens the journal; the historical command alias remains supported. Use single commands or pipe a batch:
 
 ```bash
-./clibble inspect pidgey
+./clibble inspect mosskin
 ./clibble collection
 printf 'collection\nexit\n' | ./clibble
 ```
@@ -100,7 +111,7 @@ To open the collection in a browser, run this in another terminal:
 ./clibble serve
 ```
 
-Open **http://127.0.0.1:8787**. Search your saved Pokemon by name or type, then choose
+Open **http://127.0.0.1:8787**. Search your saved wildlings by name or habitat, then choose
 one to read its record. Catch in the CLI and use **Refresh collection** to see new
 records. The companion is local and read-only; it does not expose writes or share your collection online.
 
@@ -124,8 +135,8 @@ See [save compatibility](docs/GUIDE.md#save-compatibility).
 
 ## <img src="readme-assets/icons/architecture.svg" width="24" height="24" alt=""> Architecture
 
-The same Go binary runs the CLI and serves the companion. Typed PokéAPI responses
-pass through a bounded cache; catches are stored as versioned local JSON. The web
+The same Go binary runs the CLI and serves the companion. A bundled original world
+feeds both terminal modes; collections and gameplay progress use version-2 local JSON. The web
 view reads that collection and filters records locally, without an external service.
 
 Read the [architecture guide](docs/ARCHITECTURE.md), [design system](DESIGN.md), and
@@ -156,17 +167,17 @@ on Linux, macOS, and Windows. See [release preparation](docs/RELEASE.md) for pac
 
 ## <img src="readme-assets/icons/security.svg" width="24" height="24" alt=""> Security and limitations
 
-- This is an independent, single-user Pokemon tool. There are no accounts, sync service, battle simulation, or automatic backups.
+- This is an independent, single-user nature adventure. There are no accounts, sync service, battle simulation, or automatic backups.
 - The companion binds to loopback only and rejects foreign hosts/origins. Its content policy allows bundled assets only; it has no write endpoint or third-party tracking.
 - Saves are validated, bounded to 4 MiB, flushed before replacement, and protected by cooperating-writer locks. This does not replace backups or a database durability guarantee.
-- API requests use HTTPS, explicit timeouts, response limits, and origin/path validation. Cache entries expire after five minutes and are bounded by count and response bytes.
-- Pokemon can escape. Records can be inspected offline after a successful catch; new world data depends on PokéAPI availability.
+- Catch limits discourage normal spamming, including across restarts. They use the local clock and save file; the device owner can edit both. This is a single-player game, not a tamper-proof competitive service.
+- Wildlings can escape. All exploration, catching, and saved records work offline.
 
 ## <img src="readme-assets/icons/license.svg" width="24" height="24" alt=""> License
 
 [MIT](LICENSE). Dependency and font licenses are included in
-[third-party notices](THIRD_PARTY_NOTICES.md). Pokemon names and concepts belong to
-their respective owners; data is provided by [PokéAPI](https://pokeapi.co/).
+[third-party notices](THIRD_PARTY_NOTICES.md). The current trails and wildlings are
+created for Clibble; legacy imported records remain readable.
 
 > Based on Boot.dev's [Build a Pokedex in Go](https://www.boot.dev/courses/build-pokedex-cli-golang),
 > extended with persistent saves, scriptable commands, a local collection companion,

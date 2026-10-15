@@ -5,23 +5,23 @@
 | Capability | Canonical owner | Source of truth | Allowed variants | Verification |
 | --- | --- | --- | --- | --- |
 | Command dispatch | repl.go | Existing CLI command contract | interactive / one-shot / batch | repl_test.go, cli_test.go |
-| Save lifecycle | storage.go | Version-1 collection schema | default / custom / legacy | storage_test.go, presentation_test.go |
-| RPG screen and keyboard | game.go, game_view.go | DESIGN.md | narrow / wide / loading / retry / record | game_test.go |
+| Save lifecycle | storage.go | Version-2 game schema; version-1 import | default / custom / legacy | storage_test.go, presentation_test.go |
+| RPG screen and keyboard | game.go, game_view.go, forest.go | DESIGN.md | narrow / wide / loading / retry / record | game_test.go |
 | Command presentation | presentation.go | DESIGN.md | narrow / wide / plain | presentation_test.go |
-| Catch transaction | catch.go | Existing probability and version-1 saves | success / escape / save failure / cancellation | repl_test.go, game_test.go |
+| Catch transaction | catch.go | progress.go rules and atomic version-2 saves | success / escape / save failure / cancellation | repl_test.go, game_test.go |
 | Collection API | companion.go | Read-only local save | empty / populated / unavailable | companion_test.go |
 | Search and selection | internal/webui/assets/app.js | UX-CONTRACT.md | filtered / empty / selected | tests/companion.test.mjs |
 | Scrollbar | internal/webui/assets/styles.css | DESIGN.md | normal / forced-colors | browser and static checks |
 
 
 The app is single-user. The web companion binds to loopback, rejects foreign Host
-and Origin headers, and provides no write endpoint. It reads the same version-1
+and Origin headers, and provides no write endpoint. It reads the same version-1 or version-2
 collection as the CLI. It does not expose the save path, analytics, or credentials.
 There are no payments, accounts, deletion actions, or permission settings.
 
 ## Flows
 
-- Startup: restore a collection and enter the RPG trailhead in a supported TTY.
+- Startup: restore a collection and enter the RPG title screen, then Start exploring in a supported TTY.
   Use `-plain` for command entry; dumb terminals and pipes use command mode.
 - RPG navigation: arrows/j/k move, Enter/Space selects, Esc/Backspace goes back.
   Travel opens paged destinations; selecting one explores its encounter list.
@@ -32,8 +32,14 @@ There are no payments, accounts, deletion actions, or permission settings.
   cancelling travel/exploration, and reject stale response IDs. Catch/save settles
   before another action. Failures retain prior location/collection and offer retry.
   Shutdown cancels requests and drains workers before releasing the writer lock.
-- Catch: fetch, determine outcome, persist success, then offer inspect. Save failure
-  rolls back the new in-memory catch. Escape is an outcome, not an error.
+- Catch: look up an original wildling, determine outcome, persist the complete game,
+  then offer inspect. Escapes also persist consumed supplies/tries. Save failure
+  rolls back the journal and budget together. `progress.go` owns game balance;
+  `docs/GUIDE.md` explains the rules. Reopening menus or switching trails does not
+  replenish tries. Escape is an outcome, not an error.
+- Forest settings: motion preference saves in the same transaction format. The UI
+  waits for the save before applying it; failed saves retain the previous setting.
+  Pending catches and settings cannot be cancelled halfway through a write.
 - Inspect: show a caught record without a network request; an uncaught name yields
   a correction hint. `collection` is the primary label; `pokedex` remains an alias.
 - Browse: load saved records, filter locally, choose a record, and show its details.

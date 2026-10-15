@@ -1,13 +1,13 @@
 # Using Clibble
 
-Clibble is an independent Pokemon field guide. Start `clibble` for the interactive
+Clibble is an original, offline wilderness adventure. Start `clibble` for the interactive
 RPG screen, use `clibble -plain` for the command prompt, run `clibble <command>` for a single operation, or `clibble serve` to browse a
 saved collection in your browser.
 
 ## Playing at the terminal
 
 Launch `clibble` in a supported terminal. Use up/down (or j/k) and Enter/Space to
-choose **Travel**, a destination, a Pokemon, then **Throw a Pokeball**. The narration
+choose **Start exploring**, **Travel**, a trail, a wildling, then **Offer a catch seed**. The narration
 addresses you as the explorer. You can retry after an escape; after a catch, choose
 **Inspect your catch**. Your collection and its field records also work offline.
 
@@ -22,21 +22,29 @@ releasing the collection lock.
 
 The minimum screen is 40 × 18. Resize a smaller terminal or use `-plain`. The RPG
 screen uses the alternate terminal buffer and restores it on exit. It has no
-mouse requirement, automatic animations, battles, or tile-based movement. Travel
-means choosing a PokéAPI location; your current location lasts this session only.
+mouse requirement, battles, or tile-based movement. Gentle rain, canopy shimmer,
+and particles run at 12 fps. **Forest settings** saves a motion-off preference;
+`-no-motion` disables motion for one session. Travel means choosing a bundled trail; your current location lasts this session only.
 `-ephemeral` keeps catches only until you leave. Dumb terminals automatically use
 the command interface; pipes remain plain text.
 
 ## Command prompt and one-shot commands
 
-`map` lists 20 location areas. Repeat it for the next page; `mapb` moves back.
-`explore pastoria-city-area` lists the Pokemon found there. Use `catch pidgey` to
-attempt a catch. Base experience affects the probability; higher experience means
-a lower chance. An escape does not change your collection.
+`map` lists six trails. `explore mosslight-woods` lists the wildlings living there.
+Use `catch mosskin` to offer a catch seed. Shyer wildlings are harder to catch.
+An escape leaves your journal unchanged, but uses one seed and one try.
 
-A successful catch saves immediately. `inspect pidgey` reads the stored record;
+You start with 12 seeds and three tries per wildling per 30-minute encounter
+window. Tries are shared across trails, command mode, RPG mode, and restarts.
+One seed regenerates every five minutes up to 12, including while away.
+The first offer starts the encounter window; once it expires, three tries become
+available again. Failed data lookup or save spends nothing.
+`-ephemeral` intentionally starts a fresh, temporary game. These are local
+single-player rules; editing the save or system clock can bypass them.
+
+A successful catch saves immediately. `inspect mosskin` reads the stored record;
 `collection` lists caught names, and `count` prints the number of distinct catches offline. Interactive records convert height/weight to
-metres/kilograms. Plain CLI output keeps PokéAPI's original decimetres/hectograms.
+metres/kilograms. Plain CLI output uses decimetres/hectograms for save compatibility.
 
 ## The local companion
 
@@ -45,7 +53,7 @@ clibble serve
 ```
 
 Open the printed address (normally http://127.0.0.1:8787). The interface searches
-names and types, selects a record, and shows its dimensions and base stats.
+names and habitats, selects a record, and shows its dimensions and traits.
 **Clear** removes the filter and returns focus to search. **Refresh collection**
 loads catches saved since the last refresh. An unsuccessful refresh retains the
 last readable records and allows retry.
@@ -78,7 +86,10 @@ uses the current user's filesystem controls.
 
 ## Save compatibility
 
-Clibble retains the version-1 JSON collection format. It looks under the platform
+Clibble reads version-1 collections and version-2 game saves. The first successful
+catch or settings change upgrades a legacy file atomically, preserving every
+record and adding supplies once. Version 2 stores the journal, supply refill
+time, per-wildling encounter windows, and motion preference together. It looks under the platform
 configuration directory in this order: `clibble/collection.json`, then the previous
 `dexrove/collection.json`, then `pokedex/pokedex.json`. The first existing file is
 used with its original lock. Nothing is moved, merged, or overwritten during
@@ -103,8 +114,8 @@ Its last 100 commands stay in memory only. Terminal settings are restored on exi
 
 ```bash
 clibble -plain -color never
-clibble -timeout 5s catch pidgey
-clibble -data ./collection.json inspect pidgey
+clibble -no-motion
+clibble -data ./collection.json inspect mosskin
 printf 'collection\nexit\n' | clibble
 ```
 
@@ -116,7 +127,7 @@ leave the prompt usable. An escaped catch returns success because the attempt ra
 
 - **Save already in use:** another CLI writer owns that collection. Close it or choose another `-data` file. The browser companion can remain open.
 - **Invalid save:** preserve the file and restore a backup or correct its JSON. Clibble refuses to reset a malformed collection silently.
-- **HTTP 404:** check the Pokemon or area identifier. Names use letters, digits, and hyphens.
-- **Request timeout:** retry later or increase `-timeout`. Map pagination stays unchanged after failures.
+- **Unknown wildling or trail:** use `map`, then `explore mosslight-woods`. Names use letters, digits, and hyphens.
+- **No seeds or tries:** the message shows when you can return. Reopening a menu does not reset the budget.
 - **Port in use:** choose another `-port`. The companion still binds only to 127.0.0.1.
 - **No browser records:** confirm CLI and companion use the same collection path; refresh after catching.

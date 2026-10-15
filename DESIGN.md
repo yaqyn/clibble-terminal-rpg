@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: Clibble
-description: A small Pokemon catching adventure that begins at the terminal prompt.
+description: An original wilderness adventure that begins at the terminal prompt.
 colors:
   primary: "#365b43"
   text: "#142a25"
@@ -44,13 +44,13 @@ The memorable feature is the prompt becoming a path. Clibble is pronounced
 “A little wild in your terminal.” is the invitation.
 
 The terminal is the main product. Use a full-window RPG screen for interactive play, with a highlighted choice,
-a small ASCII clearing, and a second-person narration box. Respect the user's
-font and background; use Fern for selection and headings. The cover can express the
-imagined world; it must not claim an ASCII map renderer, battles, or movement.
+a centered clearing framed by green pixel pine trees, and a second-person narration
+box. The opaque forest uses the user's terminal font. A soft fern fill and dark pine
+text mark the selected action; the chevron also works without color.
 The read-only web companion is a quiet collection album with pine and fern
 accents, pale leaf surfaces, and the same prompt-and-cursor mark.
 
-The primary audience is terminal-comfortable Pokemon fans. English is the
+The primary audience is terminal-comfortable players who enjoy quiet nature games. English is the
 supported interface language; the data source does not make this a Japan-market
 product. The brand is playful; errors and recovery instructions remain precise.
 
@@ -59,8 +59,10 @@ product. The brand is playful; errors and recovery instructions remain precise.
 [internal/brand/identity.json](internal/brand/identity.json) is the canonical
 identity and palette. This file describes its roles. The Go brand package embeds
 those tokens. `scripts/brand_assets.py` generates web CSS variables and vector
-marks from the same source. The terminal renderer maps Fern to headings on a
-terminal's existing background; normal text inherits the terminal foreground.
+marks from the same source. The command renderer maps Fern to headings on the terminal's existing background.
+The RPG renderer uses the identity file's `forest` palette: pine #10291e,
+canopy #17392a, fern #20503a, leaf #3e6a43, selection #b1d18e, ivory #e3efd4.
+These six colors have one canonical owner and are adapted to ANSI RGB in forest.go.
 The README cover is generated raster artwork, with the exact name visible.
 
 ## Typography, layout, and states
@@ -73,9 +75,12 @@ Records stay readable at 320px; details have no fixed viewport height.
 
 The default interactive CLI uses Bubble Tea's alternate screen. Menus use arrows
 and Enter, a text chevron marks selection without relying on color, and the
-narration addresses the player as you. No automatic animation or artificial waits.
-At 88 columns and above, scene/details sit beside the choices. Narrow terminals
-use a single column. Below 40 × 18, show a resize hint and allow safe exit.
+narration addresses the player as you. Procedural half-block pixel scenery frames
+centered menus, with a low-detail clearing behind text. Sparse drizzle, canopy
+shimmer, and motes animate at 12 fps without changing gameplay. Focus loss stops
+ticks; a saved Motion setting or session `-no-motion` flag makes the scene still.
+NO_COLOR uses a static character backdrop. At 40 × 18 the same actions and
+narration stay available; below that, show a resize hint and allow safe exit.
 Long lists and records scroll; returning restores the prior selected item.
 Long narration and errors have a visible Tab continuation hint and message pages.
 The `-plain` mode keeps the linear command prompt, Tab completion, and bounded

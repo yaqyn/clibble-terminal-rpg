@@ -15,7 +15,7 @@ The cover uses pine #142a25, ivory #eef3d9, fern #a7c78b, sage #617e68,
 and a small honey #e7be73 accent. The exact final prompt and creative constraints
 are in [cover-prompt.md](cover-prompt.md).
 
-`cover.webp` was generated with the built-in image generation tool, converted with
+`cover-original-world.webp` was generated with the built-in image generation tool, converted with
 ImageMagick using lossless WebP, stripped with ExifTool, and given only:
 
 - XMP-dc:Creator: Abdulrahman M. Yaqyn
