@@ -37,6 +37,7 @@ func run() error {
 func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Writer, interactive bool) error {
 	flags := flag.NewFlagSet(brand.Get().Slug, flag.ContinueOnError)
 	flags.SetOutput(errOut)
+	plain := flags.Bool("plain", false, "Use the command prompt instead of the RPG screen")
 	port := flags.Int("port", 8787, "Local web companion port (serve only)")
 	colorMode := flags.String("color", "auto", "Terminal color: auto, always, or never")
 	showVersion := flags.Bool("version", false, "Print the build version")
@@ -146,6 +147,9 @@ func runCLI(ctx context.Context, args []string, in io.Reader, out, errOut io.Wri
 			return nil
 		}
 		return err
+	}
+	if interactive && !*plain && supportsGame(in, out) {
+		return runGame(cfg, in, out)
 	}
 	if cfg.view != nil {
 		restore, err := enableEditor(cfg, in, out)
