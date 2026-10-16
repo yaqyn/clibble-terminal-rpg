@@ -60,7 +60,21 @@ func getCommands() map[string]cliCommand {
 		"collection": {"collection", "List your caught wildlings", 0, commandPokedex},
 		"pokedex":    {"pokedex", "Legacy alias for collection", 0, commandPokedex},
 		"count":      {"count", "Show the number of caught wildling", 0, commandCount},
+		"supplies":   {"supplies", "Show available catch seeds without spending any", 0, commandSupplies},
 	}
+}
+
+func commandSupplies(cfg *config, args ...string) error {
+	now := cfg.now()
+	progress := cfg.progress.refreshed(now)
+	if _, err := fmt.Fprintf(cfg.out, "Catch seeds: %d/%d\n", progress.Seeds, seedCapacity); err != nil {
+		return err
+	}
+	if progress.Seeds < seedCapacity {
+		_, err := fmt.Fprintf(cfg.out, "Next seed in: %s\n", progress.RefillAt.Add(seedInterval).Sub(now).Round(time.Second))
+		return err
+	}
+	return nil
 }
 func commandExit(cfg *config, args ...string) error {
 	fmt.Fprintln(cfg.out, "Leaving Clibble. See you on the next trail.")

@@ -63,7 +63,7 @@ The RPG screen needs a terminal at least 40 columns × 18 rows. It adapts to res
 and restores your terminal when you leave. Location and menu position last for the
 session; your journal, supplies, encounter tries, and motion preference remain saved.
 
-You begin with **12 catch seeds**. Each resolved offer costs one seed and one try,
+You begin with **12 catch seeds**. Run `./clibble supplies` to inspect the refreshed pouch and next refill time without spending seeds or saving changes. Each resolved offer costs one seed and one try,
 including escapes. You get **three tries per wildling in a 30-minute window**,
 shared across trails and restarts. One seed replenishes every five minutes, up
 to 12. API/data errors and failed saves spend nothing.
