@@ -61,7 +61,29 @@ func getCommands() map[string]cliCommand {
 		"pokedex":    {"pokedex", "Legacy alias for collection", 0, commandPokedex},
 		"count":      {"count", "Show the number of caught wildling", 0, commandCount},
 		"supplies":   {"supplies", "Show available catch seeds without spending any", 0, commandSupplies},
+		"where":      {"where <wildling>", "List bundled trails where a wildling lives", 1, commandWhere},
 	}
+}
+
+func commandWhere(cfg *config, args ...string) error {
+	var locations []string
+	for _, trail := range trails {
+		for _, name := range trail.creatures {
+			if name == args[0] {
+				locations = append(locations, trail.name)
+				break
+			}
+		}
+	}
+	if len(locations) == 0 {
+		return fmt.Errorf("unknown wildling %q; explore a trail to meet one", args[0])
+	}
+	for _, location := range locations {
+		if _, err := fmt.Fprintln(cfg.out, location); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func commandSupplies(cfg *config, args ...string) error {

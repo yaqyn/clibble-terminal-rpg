@@ -92,7 +92,7 @@ continue to work directly.
 | `serve` | Start the local web companion; run this from your shell |
 | `exit` | Leave the interactive session |
 
-Commands and identifiers are case-insensitive. `collection` opens the journal; the historical command alias remains supported. Use single commands or pipe a batch:
+Commands and identifiers are case-insensitive. `collection` opens the journal; the historical command alias remains supported. Use `where <wildling>` to list its bundled trails offline without spending seeds. Use single commands or pipe a batch:
 
 ```bash
 ./clibble inspect mosskin
