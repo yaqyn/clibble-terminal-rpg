@@ -1,5 +1,6 @@
 {
   "name": "clibble-ui-checks",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
