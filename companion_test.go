@@ -40,6 +40,23 @@ func TestCompanionReadsCollectionAndServesEmbeddedAssets(t *testing.T) {
 		}
 	}
 }
+func TestCompanionCollectionSearch(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	savePokedex(path, map[string]pokeapi.Pokemon{
+		"pidgey": {Name: "pidgey"}, "pikachu": {Name: "pikachu"},
+	})
+	handler := companionHandler(path, "127.0.0.1:8787")
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?q=PIKA", nil))
+	if response.Code != http.StatusOK || strings.Contains(response.Body.String(), "pidgey") || !strings.Contains(response.Body.String(), "pikachu") {
+		t.Fatal(response.Code, response.Body.String())
+	}
+	response = httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?q="+strings.Repeat("x", 101), nil))
+	if response.Code != http.StatusBadRequest {
+		t.Fatal(response.Code)
+	}
+}
 func TestCompanionRejectsForeignHostsOriginsAndWrites(t *testing.T) {
 	handler := companionHandler(filepath.Join(t.TempDir(), "collection.json"), "127.0.0.1:8787")
 	for _, tc := range []struct {

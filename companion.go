@@ -43,6 +43,11 @@ func companionHandler(path, authority string) http.Handler {
 			return
 		}
 		if r.URL.Path == "/api/collection" {
+			query := strings.TrimSpace(r.URL.Query().Get("q"))
+			if len([]rune(query)) > 100 {
+				http.Error(w, "Search must contain 100 characters or fewer.", http.StatusBadRequest)
+				return
+			}
 			pokemon, err := loadPokedex(path)
 			if err != nil {
 				http.Error(w, "The collection could not be read. Check the save file with the CLI, then refresh.", http.StatusInternalServerError)
@@ -50,6 +55,9 @@ func companionHandler(path, authority string) http.Handler {
 			}
 			items := make([]pokeapi.Pokemon, 0, len(pokemon))
 			for _, name := range sortedKeys(pokemon) {
+				if query != "" && !strings.Contains(strings.ToLower(name), strings.ToLower(query)) {
+					continue
+				}
 				items = append(items, pokemon[name])
 			}
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
