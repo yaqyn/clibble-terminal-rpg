@@ -79,6 +79,19 @@ func TestCompanionRejectsForeignHostsOriginsAndWrites(t *testing.T) {
 		}
 	}
 }
+func TestCompanionCollectionSearchIncludesTypes(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	var pidgey pokeapi.Pokemon
+	if err := json.Unmarshal([]byte(`{"name":"pidgey","types":[{"type":{"name":"flying"}}]}`), &pidgey); err != nil {
+		t.Fatal(err)
+	}
+	savePokedex(path, map[string]pokeapi.Pokemon{"pidgey": pidgey, "pikachu": {Name: "pikachu"}})
+	response := httptest.NewRecorder()
+	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?q=FLYING", nil))
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "pidgey") || strings.Contains(response.Body.String(), "pikachu") {
+		t.Fatal(response.Code, response.Body.String())
+	}
+}
 func TestCompanionReportsCorruptionWithoutLeakingOrChangingSave(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "private-collection.json")
 	os.WriteFile(path, []byte("{broken"), 0600)

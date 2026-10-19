@@ -55,10 +55,15 @@ func companionHandler(path, authority string) http.Handler {
 			}
 			items := make([]pokeapi.Pokemon, 0, len(pokemon))
 			for _, name := range sortedKeys(pokemon) {
-				if query != "" && !strings.Contains(strings.ToLower(name), strings.ToLower(query)) {
+				entry := pokemon[name]
+				matches := strings.Contains(strings.ToLower(name), strings.ToLower(query))
+				for _, kind := range entry.Types {
+					matches = matches || strings.Contains(strings.ToLower(kind.Type.Name), strings.ToLower(query))
+				}
+				if query != "" && !matches {
 					continue
 				}
-				items = append(items, pokemon[name])
+				items = append(items, entry)
 			}
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			if r.Method == http.MethodHead {
