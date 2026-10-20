@@ -43,7 +43,12 @@ func companionHandler(path, authority string) http.Handler {
 			return
 		}
 		if r.URL.Path == "/api/collection" {
-			query := strings.TrimSpace(r.URL.Query().Get("q"))
+			values := r.URL.Query()
+			if len(values["q"]) > 1 {
+				http.Error(w, "Search may be provided only once.", http.StatusBadRequest)
+				return
+			}
+			query := strings.TrimSpace(values.Get("q"))
 			if len([]rune(query)) > 100 {
 				http.Error(w, "Search must contain 100 characters or fewer.", http.StatusBadRequest)
 				return
