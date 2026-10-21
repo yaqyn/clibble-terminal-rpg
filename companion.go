@@ -44,6 +44,12 @@ func companionHandler(path, authority string) http.Handler {
 		}
 		if r.URL.Path == "/api/collection" {
 			values := r.URL.Query()
+			for name := range values {
+				if name != "q" {
+					http.Error(w, "Unknown collection filter.", http.StatusBadRequest)
+					return
+				}
+			}
 			if len(values["q"]) > 1 {
 				http.Error(w, "Search may be provided only once.", http.StatusBadRequest)
 				return

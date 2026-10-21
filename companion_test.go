@@ -61,6 +61,11 @@ func TestCompanionCollectionSearch(t *testing.T) {
 	if response.Code != http.StatusBadRequest {
 		t.Fatal("duplicate search accepted", response.Code)
 	}
+	response = httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?query=pika", nil))
+	if response.Code != http.StatusBadRequest {
+		t.Fatal("unknown search accepted", response.Code)
+	}
 }
 func TestCompanionRejectsForeignHostsOriginsAndWrites(t *testing.T) {
 	handler := companionHandler(filepath.Join(t.TempDir(), "collection.json"), "127.0.0.1:8787")
