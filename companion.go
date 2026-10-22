@@ -67,11 +67,15 @@ func companionHandler(path, authority string) http.Handler {
 			items := make([]pokeapi.Pokemon, 0, len(pokemon))
 			for _, name := range sortedKeys(pokemon) {
 				entry := pokemon[name]
-				matches := strings.Contains(strings.ToLower(name), strings.ToLower(query))
+				searchable := strings.ToLower(name)
 				for _, kind := range entry.Types {
-					matches = matches || strings.Contains(strings.ToLower(kind.Type.Name), strings.ToLower(query))
+					searchable += " " + strings.ToLower(kind.Type.Name)
 				}
-				if query != "" && !matches {
+				matches := true
+				for _, term := range strings.Fields(strings.ToLower(query)) {
+					matches = matches && strings.Contains(searchable, term)
+				}
+				if !matches {
 					continue
 				}
 				items = append(items, entry)

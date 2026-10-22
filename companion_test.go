@@ -102,6 +102,22 @@ func TestCompanionCollectionSearchIncludesTypes(t *testing.T) {
 		t.Fatal(response.Code, response.Body.String())
 	}
 }
+func TestCompanionCollectionSearchCombinesWordsAcrossNameAndType(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	var pidgey, pikachu pokeapi.Pokemon
+	if err := json.Unmarshal([]byte(`{"name":"pidgey","types":[{"type":{"name":"flying"}}]}`), &pidgey); err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal([]byte(`{"name":"pikachu","types":[{"type":{"name":"electric"}}]}`), &pikachu); err != nil {
+		t.Fatal(err)
+	}
+	savePokedex(path, map[string]pokeapi.Pokemon{"pidgey": pidgey, "pikachu": pikachu})
+	response := httptest.NewRecorder()
+	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?q=pidge+flying", nil))
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "pidgey") || strings.Contains(response.Body.String(), "pikachu") {
+		t.Fatal(response.Code, response.Body.String())
+	}
+}
 func TestCompanionReportsCorruptionWithoutLeakingOrChangingSave(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "private-collection.json")
 	os.WriteFile(path, []byte("{broken"), 0600)
