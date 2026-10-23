@@ -114,7 +114,7 @@ To open the collection in a browser, run this in another terminal:
 
 Open **http://127.0.0.1:8787**. Search your saved wildlings by name or habitat, then choose
 one to read its record. Catch in the CLI and use **Refresh collection** to see new
-records. The companion is local and read-only; it does not expose writes or share your collection online.
+records. API readers can combine `q` terms with an exact `type` filter. The companion is local and read-only; it does not expose writes or share your collection online.
 
 See the [user guide](docs/GUIDE.md) for flags, storage locations, recovery, and examples.
 

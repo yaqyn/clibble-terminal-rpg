@@ -102,6 +102,22 @@ func TestCompanionCollectionSearchIncludesTypes(t *testing.T) {
 		t.Fatal(response.Code, response.Body.String())
 	}
 }
+func TestCompanionCollectionFiltersByExactType(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	var flying, electric pokeapi.Pokemon
+	if err := json.Unmarshal([]byte(`{"name":"pidgey","types":[{"type":{"name":"flying"}}]}`), &flying); err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal([]byte(`{"name":"pikachu","types":[{"type":{"name":"electric"}}]}`), &electric); err != nil {
+		t.Fatal(err)
+	}
+	savePokedex(path, map[string]pokeapi.Pokemon{"pidgey": flying, "pikachu": electric})
+	response := httptest.NewRecorder()
+	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?type=FLYING", nil))
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "pidgey") || strings.Contains(response.Body.String(), "pikachu") {
+		t.Fatal(response.Code, response.Body.String())
+	}
+}
 func TestCompanionCollectionSearchCombinesWordsAcrossNameAndType(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	var pidgey, pikachu pokeapi.Pokemon

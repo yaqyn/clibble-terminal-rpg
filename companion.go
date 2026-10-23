@@ -45,18 +45,25 @@ func companionHandler(path, authority string) http.Handler {
 		if r.URL.Path == "/api/collection" {
 			values := r.URL.Query()
 			for name := range values {
-				if name != "q" {
+				if name != "q" && name != "type" {
 					http.Error(w, "Unknown collection filter.", http.StatusBadRequest)
 					return
 				}
 			}
-			if len(values["q"]) > 1 {
-				http.Error(w, "Search may be provided only once.", http.StatusBadRequest)
-				return
+			for _, name := range []string{"q", "type"} {
+				if len(values[name]) > 1 {
+					http.Error(w, "Collection filters may be provided only once.", http.StatusBadRequest)
+					return
+				}
 			}
 			query := strings.TrimSpace(values.Get("q"))
+			typeFilter := strings.ToLower(strings.TrimSpace(values.Get("type")))
 			if len([]rune(query)) > 100 {
 				http.Error(w, "Search must contain 100 characters or fewer.", http.StatusBadRequest)
+				return
+			}
+			if len([]rune(typeFilter)) > 50 {
+				http.Error(w, "Type must contain 50 characters or fewer.", http.StatusBadRequest)
 				return
 			}
 			pokemon, err := loadPokedex(path)
@@ -68,14 +75,17 @@ func companionHandler(path, authority string) http.Handler {
 			for _, name := range sortedKeys(pokemon) {
 				entry := pokemon[name]
 				searchable := strings.ToLower(name)
+				typeMatches := typeFilter == ""
 				for _, kind := range entry.Types {
-					searchable += " " + strings.ToLower(kind.Type.Name)
+					kindName := strings.ToLower(kind.Type.Name)
+					searchable += " " + kindName
+					typeMatches = typeMatches || kindName == typeFilter
 				}
 				matches := true
 				for _, term := range strings.Fields(strings.ToLower(query)) {
 					matches = matches && strings.Contains(searchable, term)
 				}
-				if !matches {
+				if !matches || !typeMatches {
 					continue
 				}
 				items = append(items, entry)
