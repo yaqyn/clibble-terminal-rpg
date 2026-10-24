@@ -67,6 +67,24 @@ func TestCompanionCollectionSearch(t *testing.T) {
 		t.Fatal("unknown search accepted", response.Code)
 	}
 }
+func TestCompanionCollectionLimit(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	savePokedex(path, map[string]pokeapi.Pokemon{"alpha": {Name: "alpha"}, "beta": {Name: "beta"}})
+	handler := companionHandler(path, "127.0.0.1:8787")
+	response := httptest.NewRecorder()
+	handler.ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?limit=1", nil))
+	var body struct{ Pokemon []pokeapi.Pokemon }
+	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil || response.Code != 200 || len(body.Pokemon) != 1 || body.Pokemon[0].Name != "alpha" {
+		t.Fatalf("limited response: %d %s", response.Code, response.Body.String())
+	}
+	for _, value := range []string{"0", "501", "many"} {
+		response = httptest.NewRecorder()
+		handler.ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?limit="+value, nil))
+		if response.Code != http.StatusBadRequest {
+			t.Fatalf("accepted limit %q: %d", value, response.Code)
+		}
+	}
+}
 func TestCompanionRejectsForeignHostsOriginsAndWrites(t *testing.T) {
 	handler := companionHandler(filepath.Join(t.TempDir(), "collection.json"), "127.0.0.1:8787")
 	for _, tc := range []struct {

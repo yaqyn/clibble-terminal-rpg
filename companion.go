@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -45,12 +46,12 @@ func companionHandler(path, authority string) http.Handler {
 		if r.URL.Path == "/api/collection" {
 			values := r.URL.Query()
 			for name := range values {
-				if name != "q" && name != "type" {
+				if name != "q" && name != "type" && name != "limit" {
 					http.Error(w, "Unknown collection filter.", http.StatusBadRequest)
 					return
 				}
 			}
-			for _, name := range []string{"q", "type"} {
+			for _, name := range []string{"q", "type", "limit"} {
 				if len(values[name]) > 1 {
 					http.Error(w, "Collection filters may be provided only once.", http.StatusBadRequest)
 					return
@@ -65,6 +66,15 @@ func companionHandler(path, authority string) http.Handler {
 			if len([]rune(typeFilter)) > 50 {
 				http.Error(w, "Type must contain 50 characters or fewer.", http.StatusBadRequest)
 				return
+			}
+			limit := 0
+			if raw := values.Get("limit"); raw != "" {
+				var err error
+				limit, err = strconv.Atoi(raw)
+				if err != nil || limit < 1 || limit > 500 {
+					http.Error(w, "Limit must be an integer between 1 and 500.", http.StatusBadRequest)
+					return
+				}
 			}
 			pokemon, err := loadPokedex(path)
 			if err != nil {
@@ -89,6 +99,9 @@ func companionHandler(path, authority string) http.Handler {
 					continue
 				}
 				items = append(items, entry)
+				if limit > 0 && len(items) == limit {
+					break
+				}
 			}
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			if r.Method == http.MethodHead {
