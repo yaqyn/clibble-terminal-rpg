@@ -46,12 +46,12 @@ func companionHandler(path, authority string) http.Handler {
 		if r.URL.Path == "/api/collection" {
 			values := r.URL.Query()
 			for name := range values {
-				if name != "q" && name != "type" && name != "limit" {
+				if name != "q" && name != "type" && name != "limit" && name != "sort" {
 					http.Error(w, "Unknown collection filter.", http.StatusBadRequest)
 					return
 				}
 			}
-			for _, name := range []string{"q", "type", "limit"} {
+			for _, name := range []string{"q", "type", "limit", "sort"} {
 				if len(values[name]) > 1 {
 					http.Error(w, "Collection filters may be provided only once.", http.StatusBadRequest)
 					return
@@ -76,6 +76,11 @@ func companionHandler(path, authority string) http.Handler {
 					return
 				}
 			}
+			sortOrder := values.Get("sort")
+			if sortOrder != "" && sortOrder != "name" && sortOrder != "name-desc" {
+				http.Error(w, "Sort must be name or name-desc.", http.StatusBadRequest)
+				return
+			}
 			pokemon, err := loadPokedex(path)
 			if err != nil {
 				http.Error(w, "The collection could not be read. Check the save file with the CLI, then refresh.", http.StatusInternalServerError)
@@ -99,9 +104,14 @@ func companionHandler(path, authority string) http.Handler {
 					continue
 				}
 				items = append(items, entry)
-				if limit > 0 && len(items) == limit {
-					break
+			}
+			if sortOrder == "name-desc" {
+				for left, right := 0, len(items)-1; left < right; left, right = left+1, right-1 {
+					items[left], items[right] = items[right], items[left]
 				}
+			}
+			if limit > 0 && len(items) > limit {
+				items = items[:limit]
 			}
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			if r.Method == http.MethodHead {

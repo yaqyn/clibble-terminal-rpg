@@ -85,6 +85,20 @@ func TestCompanionCollectionLimit(t *testing.T) {
 		}
 	}
 }
+func TestCompanionCollectionSortsDescendingBeforeLimiting(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	savePokedex(path, map[string]pokeapi.Pokemon{"alpha": {Name: "alpha"}, "beta": {Name: "beta"}})
+	response := httptest.NewRecorder()
+	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?sort=name-desc&limit=1", nil))
+	if response.Code != 200 || !strings.Contains(response.Body.String(), "beta") || strings.Contains(response.Body.String(), "alpha") {
+		t.Fatalf("descending response: %d %s", response.Code, response.Body.String())
+	}
+	response = httptest.NewRecorder()
+	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?sort=random", nil))
+	if response.Code != http.StatusBadRequest {
+		t.Fatalf("accepted invalid sort: %d", response.Code)
+	}
+}
 func TestCompanionRejectsForeignHostsOriginsAndWrites(t *testing.T) {
 	handler := companionHandler(filepath.Join(t.TempDir(), "collection.json"), "127.0.0.1:8787")
 	for _, tc := range []struct {
