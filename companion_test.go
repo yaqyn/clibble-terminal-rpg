@@ -99,6 +99,22 @@ func TestCompanionCollectionSortsDescendingBeforeLimiting(t *testing.T) {
 		t.Fatalf("accepted invalid sort: %d", response.Code)
 	}
 }
+func TestCompanionCollectionOffset(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	savePokedex(path, map[string]pokeapi.Pokemon{"alpha": {Name: "alpha"}, "beta": {Name: "beta"}})
+	response := httptest.NewRecorder()
+	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?offset=1&limit=1", nil))
+	if response.Code != 200 || strings.Contains(response.Body.String(), "alpha") || !strings.Contains(response.Body.String(), "beta") {
+		t.Fatalf("offset response: %d %s", response.Code, response.Body.String())
+	}
+	for _, value := range []string{"-1", "100001", "many"} {
+		response = httptest.NewRecorder()
+		companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?offset="+value, nil))
+		if response.Code != http.StatusBadRequest {
+			t.Fatalf("accepted offset %q: %d", value, response.Code)
+		}
+	}
+}
 func TestCompanionRejectsForeignHostsOriginsAndWrites(t *testing.T) {
 	handler := companionHandler(filepath.Join(t.TempDir(), "collection.json"), "127.0.0.1:8787")
 	for _, tc := range []struct {

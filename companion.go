@@ -46,12 +46,12 @@ func companionHandler(path, authority string) http.Handler {
 		if r.URL.Path == "/api/collection" {
 			values := r.URL.Query()
 			for name := range values {
-				if name != "q" && name != "type" && name != "limit" && name != "sort" {
+				if name != "q" && name != "type" && name != "limit" && name != "offset" && name != "sort" {
 					http.Error(w, "Unknown collection filter.", http.StatusBadRequest)
 					return
 				}
 			}
-			for _, name := range []string{"q", "type", "limit", "sort"} {
+			for _, name := range []string{"q", "type", "limit", "offset", "sort"} {
 				if len(values[name]) > 1 {
 					http.Error(w, "Collection filters may be provided only once.", http.StatusBadRequest)
 					return
@@ -73,6 +73,15 @@ func companionHandler(path, authority string) http.Handler {
 				limit, err = strconv.Atoi(raw)
 				if err != nil || limit < 1 || limit > 500 {
 					http.Error(w, "Limit must be an integer between 1 and 500.", http.StatusBadRequest)
+					return
+				}
+			}
+			offset := 0
+			if raw := values.Get("offset"); raw != "" {
+				var err error
+				offset, err = strconv.Atoi(raw)
+				if err != nil || offset < 0 || offset > 100000 {
+					http.Error(w, "Offset must be an integer between 0 and 100000.", http.StatusBadRequest)
 					return
 				}
 			}
@@ -109,6 +118,11 @@ func companionHandler(path, authority string) http.Handler {
 				for left, right := 0, len(items)-1; left < right; left, right = left+1, right-1 {
 					items[left], items[right] = items[right], items[left]
 				}
+			}
+			if offset >= len(items) {
+				items = items[:0]
+			} else {
+				items = items[offset:]
 			}
 			if limit > 0 && len(items) > limit {
 				items = items[:limit]
