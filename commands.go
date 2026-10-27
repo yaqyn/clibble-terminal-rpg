@@ -63,7 +63,20 @@ func getCommands() map[string]cliCommand {
 		"types":      {"types", "Summarize your collection by wildling type", 0, commandTypes},
 		"supplies":   {"supplies", "Show available catch seeds without spending any", 0, commandSupplies},
 		"where":      {"where <wildling>", "List bundled trails where a wildling lives", 1, commandWhere},
+		"trails":     {"trails", "List bundled trails and their wildling counts", 0, commandTrails},
 	}
+}
+
+func commandTrails(cfg *config, args ...string) error {
+	if _, err := fmt.Fprintln(cfg.out, "Bundled trails:"); err != nil {
+		return err
+	}
+	for _, trail := range trails {
+		if _, err := fmt.Fprintf(cfg.out, " - %s: %d wildlings\n", trail.name, len(trail.creatures)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func commandWhere(cfg *config, args ...string) error {
