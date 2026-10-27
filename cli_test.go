@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
@@ -119,5 +120,28 @@ func TestCLICountUsesSavedCollectionOffline(t *testing.T) {
 	}
 	if out.String() != "Befriended wildlings: 0\n" {
 		t.Fatal(out.String())
+	}
+}
+
+func TestCollectionTypesAreSummarizedOffline(t *testing.T) {
+	var flying, electric pokeapi.Pokemon
+	if err := json.Unmarshal([]byte(`{"name":"pidgey","types":[{"type":{"name":"flying"}},{"type":{"name":"normal"}}]}`), &flying); err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal([]byte(`{"name":"pikachu","types":[{"type":{"name":"electric"}}]}`), &electric); err != nil {
+		t.Fatal(err)
+	}
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{"pidgey": flying, "pikachu": electric}}
+	if err := commandTypes(cfg); err != nil {
+		t.Fatal(err)
+	}
+	if output.String() != "Collection types:\n - electric: 1\n - flying: 1\n - normal: 1\n" {
+		t.Fatal(output.String())
+	}
+	output.Reset()
+	cfg.pokedex = map[string]pokeapi.Pokemon{}
+	if err := commandTypes(cfg); err != nil || !strings.Contains(output.String(), "No caught wildling types") {
+		t.Fatal(output.String(), err)
 	}
 }
