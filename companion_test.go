@@ -26,6 +26,9 @@ func TestCompanionReadsCollectionAndServesEmbeddedAssets(t *testing.T) {
 		if response.Header().Get("Content-Security-Policy") == "" {
 			t.Fatal("missing CSP")
 		}
+		if response.Header().Get("Permissions-Policy") == "" || response.Header().Get("Cross-Origin-Resource-Policy") != "same-origin" {
+			t.Fatal("missing browser isolation headers")
+		}
 		if route == "/api/collection" {
 			var body struct{ Pokemon []pokeapi.Pokemon }
 			if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil {
