@@ -48,18 +48,19 @@ func companionHandler(path, authority string) http.Handler {
 		if r.URL.Path == "/api/collection" {
 			values := r.URL.Query()
 			for name := range values {
-				if name != "q" && name != "type" && name != "limit" && name != "offset" && name != "sort" {
+				if name != "q" && name != "name" && name != "type" && name != "limit" && name != "offset" && name != "sort" {
 					http.Error(w, "Unknown collection filter.", http.StatusBadRequest)
 					return
 				}
 			}
-			for _, name := range []string{"q", "type", "limit", "offset", "sort"} {
+			for _, name := range []string{"q", "name", "type", "limit", "offset", "sort"} {
 				if len(values[name]) > 1 {
 					http.Error(w, "Collection filters may be provided only once.", http.StatusBadRequest)
 					return
 				}
 			}
 			query := strings.TrimSpace(values.Get("q"))
+			nameFilter := strings.ToLower(strings.TrimSpace(values.Get("name")))
 			typeFilter := strings.ToLower(strings.TrimSpace(values.Get("type")))
 			if len([]rune(query)) > 100 {
 				http.Error(w, "Search must contain 100 characters or fewer.", http.StatusBadRequest)
@@ -67,6 +68,10 @@ func companionHandler(path, authority string) http.Handler {
 			}
 			if len([]rune(typeFilter)) > 50 {
 				http.Error(w, "Type must contain 50 characters or fewer.", http.StatusBadRequest)
+				return
+			}
+			if len([]rune(nameFilter)) > 100 {
+				http.Error(w, "Name must contain 100 characters or fewer.", http.StatusBadRequest)
 				return
 			}
 			limit := 0
@@ -100,6 +105,9 @@ func companionHandler(path, authority string) http.Handler {
 			items := make([]pokeapi.Pokemon, 0, len(pokemon))
 			for _, name := range sortedKeys(pokemon) {
 				entry := pokemon[name]
+				if nameFilter != "" && strings.ToLower(name) != nameFilter {
+					continue
+				}
 				searchable := strings.ToLower(name)
 				typeMatches := typeFilter == ""
 				for _, kind := range entry.Types {

@@ -169,6 +169,15 @@ func TestCompanionCollectionFiltersByExactType(t *testing.T) {
 		t.Fatal(response.Code, response.Body.String())
 	}
 }
+func TestCompanionCollectionFiltersByExactName(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	savePokedex(path, map[string]pokeapi.Pokemon{"pidgey": {Name: "pidgey"}, "pidgeotto": {Name: "pidgeotto"}})
+	response := httptest.NewRecorder()
+	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?name=PIDGEY", nil))
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "pidgey") || strings.Contains(response.Body.String(), "pidgeotto") {
+		t.Fatal(response.Code, response.Body.String())
+	}
+}
 func TestCompanionCollectionSearchCombinesWordsAcrossNameAndType(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	var pidgey, pikachu pokeapi.Pokemon
