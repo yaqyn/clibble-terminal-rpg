@@ -60,6 +60,7 @@ func getCommands() map[string]cliCommand {
 		"collection": {"collection", "List your caught wildlings", 0, commandPokedex},
 		"pokedex":    {"pokedex", "Legacy alias for collection", 0, commandPokedex},
 		"count":      {"count", "Show the number of caught wildling", 0, commandCount},
+		"types":      {"types", "Summarize your collection by wildling type", 0, commandTypes},
 		"supplies":   {"supplies", "Show available catch seeds without spending any", 0, commandSupplies},
 		"where":      {"where <wildling>", "List bundled trails where a wildling lives", 1, commandWhere},
 	}
@@ -232,4 +233,26 @@ func validName(name string) bool { return pokeapi.ValidName(name) }
 func commandCount(cfg *config, args ...string) error {
 	_, err := fmt.Fprintf(cfg.out, "Befriended wildlings: %d\n", len(cfg.pokedex))
 	return err
+}
+
+func commandTypes(cfg *config, args ...string) error {
+	counts := map[string]int{}
+	for _, pokemon := range cfg.pokedex {
+		for _, kind := range pokemon.Types {
+			counts[kind.Type.Name]++
+		}
+	}
+	if len(counts) == 0 {
+		_, err := fmt.Fprintln(cfg.out, "No caught wildling types yet. Try catch <wildling>.")
+		return err
+	}
+	if _, err := fmt.Fprintln(cfg.out, "Collection types:"); err != nil {
+		return err
+	}
+	for _, name := range sortedKeys(counts) {
+		if _, err := fmt.Fprintf(cfg.out, " - %s: %d\n", name, counts[name]); err != nil {
+			return err
+		}
+	}
+	return nil
 }
