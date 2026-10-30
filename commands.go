@@ -149,10 +149,12 @@ func commandSupplies(cfg *config, args ...string) error {
 	}
 	return nil
 }
+
 func commandExit(cfg *config, args ...string) error {
 	fmt.Fprintln(cfg.out, "Leaving Clibble. See you on the next trail.")
 	return errExit
 }
+
 func commandHelp(cfg *config, args ...string) error {
 	if cfg.view != nil {
 		cfg.view.help()
@@ -166,6 +168,7 @@ func commandHelp(cfg *config, args ...string) error {
 	fmt.Fprintln(cfg.out, "\nserve: Open the local collection companion (clibble serve)")
 	return nil
 }
+
 func sortedKeys[V any](values map[string]V) []string {
 	keys := make([]string, 0, len(values))
 	for key := range values {
@@ -174,6 +177,7 @@ func sortedKeys[V any](values map[string]V) []string {
 	sort.Strings(keys)
 	return keys
 }
+
 func commandMap(cfg *config, args ...string) error {
 	if cfg.started && cfg.next == nil {
 		fmt.Fprintln(cfg.out, "you're on the last page")
@@ -181,6 +185,7 @@ func commandMap(cfg *config, args ...string) error {
 	}
 	return showLocations(cfg, cfg.next)
 }
+
 func commandMapBack(cfg *config, args ...string) error {
 	if cfg.previous == nil {
 		fmt.Fprintln(cfg.out, "you're on the first page")
@@ -188,6 +193,7 @@ func commandMapBack(cfg *config, args ...string) error {
 	}
 	return showLocations(cfg, cfg.previous)
 }
+
 func showLocations(cfg *config, page *string) error {
 	result, err := cfg.client.ListLocations(cfg.ctx, page)
 	if err != nil {
@@ -203,6 +209,7 @@ func showLocations(cfg *config, page *string) error {
 	cfg.next, cfg.previous, cfg.started = result.Next, result.Previous, true
 	return nil
 }
+
 func commandExplore(cfg *config, args ...string) error {
 	fmt.Fprintf(cfg.out, "Exploring %s...\n", args[0])
 	area, err := cfg.client.Explore(cfg.ctx, args[0])
@@ -215,12 +222,14 @@ func commandExplore(cfg *config, args ...string) error {
 	}
 	return nil
 }
+
 func catchProbability(experience int) float64 {
 	if experience < 0 {
 		experience = 0
 	}
 	return 100.0 / (100.0 + float64(experience))
 }
+
 func commandCatch(cfg *config, args ...string) error {
 	if _, ok := cfg.pokedex[args[0]]; ok {
 		fmt.Fprintf(cfg.out, "%s is already in your collection.\n", args[0])
@@ -245,6 +254,7 @@ func commandCatch(cfg *config, args ...string) error {
 	fmt.Fprintf(cfg.out, "%s was caught!\nOpen its record with inspect <wildling>.\n", result.pokemon.Name)
 	return nil
 }
+
 func commandInspect(cfg *config, args ...string) error {
 	pokemon, ok := cfg.pokedex[args[0]]
 	if !ok {
@@ -264,6 +274,7 @@ func commandInspect(cfg *config, args ...string) error {
 	}
 	return nil
 }
+
 func commandPokedex(cfg *config, args ...string) error {
 	if cfg.view != nil {
 		cfg.view.collection(cfg.pokedex)

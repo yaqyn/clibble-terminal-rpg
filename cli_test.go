@@ -41,6 +41,7 @@ func TestCLIHelpVersionAndInvalidCommandsHaveNoSaveSideEffects(t *testing.T) {
 		t.Fatalf("help or bad args created directory: %v", err)
 	}
 }
+
 func TestCLIRestoresCollectionForSingleCommand(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "pokedex.json")
 	if err := savePokedex(path, map[string]pokeapi.Pokemon{"pidgey": {Name: "pidgey", Height: 3, Weight: 18}}); err != nil {
@@ -57,6 +58,7 @@ func TestCLIRestoresCollectionForSingleCommand(t *testing.T) {
 		t.Fatal("uncaught inspection succeeded")
 	}
 }
+
 func TestCLIEphemeralAndAutomaticDirectory(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "nested", "save.json")
 	var out, errOut bytes.Buffer
@@ -73,6 +75,7 @@ func TestCLIEphemeralAndAutomaticDirectory(t *testing.T) {
 		t.Fatal(out.String())
 	}
 }
+
 func TestCLIDefaultSaveDirectory(t *testing.T) {
 	if runtime.GOOS != "linux" && runtime.GOOS != "windows" {
 		t.Skip("platform config location cannot be isolated without changing HOME")
@@ -88,6 +91,7 @@ func TestCLIDefaultSaveDirectory(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
 func TestCLIBatchReportsErrorsAndContinues(t *testing.T) {
 	var out, errOut bytes.Buffer
 	err := runCLI(context.Background(), []string{"-ephemeral"}, strings.NewReader("unknown\npokedex\nexit\n"), &out, &errOut, false)
@@ -152,21 +156,33 @@ func TestCollectionCanBeFilteredByTypeOffline(t *testing.T) {
 	json.Unmarshal([]byte(`{"name":"spearow","types":[{"type":{"name":"flying"}}]}`), &spearow)
 	var output bytes.Buffer
 	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{"spearow": spearow, "pidgey": pidgey}}
-	if err := commandType(cfg, "flying"); err != nil { t.Fatal(err) }
-	if output.String() != "flying wildlings: pidgey, spearow\n" { t.Fatal(output.String()) }
+	if err := commandType(cfg, "flying"); err != nil {
+		t.Fatal(err)
+	}
+	if output.String() != "flying wildlings: pidgey, spearow\n" {
+		t.Fatal(output.String())
+	}
 	output.Reset()
-	if err := commandType(cfg, "water"); err != nil || output.String() != "No caught water wildlings.\n" { t.Fatal(output.String(), err) }
+	if err := commandType(cfg, "water"); err != nil || output.String() != "No caught water wildlings.\n" {
+		t.Fatal(output.String(), err)
+	}
 }
 
 func TestLargestWildlingIsReportedOffline(t *testing.T) {
 	var output bytes.Buffer
 	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{
-		"pidgey": {Name: "pidgey", Weight: 18},
+		"pidgey":  {Name: "pidgey", Weight: 18},
 		"pikachu": {Name: "pikachu", Weight: 60},
 	}}
-	if err := commandLargest(cfg); err != nil { t.Fatal(err) }
-	if output.String() != "Heaviest wildling: pikachu (60 hg)\n" { t.Fatal(output.String()) }
+	if err := commandLargest(cfg); err != nil {
+		t.Fatal(err)
+	}
+	if output.String() != "Heaviest wildling: pikachu (60 hg)\n" {
+		t.Fatal(output.String())
+	}
 	output.Reset()
 	cfg.pokedex = map[string]pokeapi.Pokemon{}
-	if err := commandLargest(cfg); err != nil || !strings.Contains(output.String(), "No wildling caught") { t.Fatal(output.String(), err) }
+	if err := commandLargest(cfg); err != nil || !strings.Contains(output.String(), "No wildling caught") {
+		t.Fatal(output.String(), err)
+	}
 }
