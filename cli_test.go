@@ -145,3 +145,15 @@ func TestCollectionTypesAreSummarizedOffline(t *testing.T) {
 		t.Fatal(output.String(), err)
 	}
 }
+
+func TestCollectionCanBeFilteredByTypeOffline(t *testing.T) {
+	var pidgey, spearow pokeapi.Pokemon
+	json.Unmarshal([]byte(`{"name":"pidgey","types":[{"type":{"name":"flying"}}]}`), &pidgey)
+	json.Unmarshal([]byte(`{"name":"spearow","types":[{"type":{"name":"flying"}}]}`), &spearow)
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{"spearow": spearow, "pidgey": pidgey}}
+	if err := commandType(cfg, "flying"); err != nil { t.Fatal(err) }
+	if output.String() != "flying wildlings: pidgey, spearow\n" { t.Fatal(output.String()) }
+	output.Reset()
+	if err := commandType(cfg, "water"); err != nil || output.String() != "No caught water wildlings.\n" { t.Fatal(output.String(), err) }
+}

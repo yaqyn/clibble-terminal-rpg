@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
@@ -61,10 +62,30 @@ func getCommands() map[string]cliCommand {
 		"pokedex":    {"pokedex", "Legacy alias for collection", 0, commandPokedex},
 		"count":      {"count", "Show the number of caught wildling", 0, commandCount},
 		"types":      {"types", "Summarize your collection by wildling type", 0, commandTypes},
+		"type":       {"type <type>", "List caught wildlings with a type", 1, commandType},
 		"supplies":   {"supplies", "Show available catch seeds without spending any", 0, commandSupplies},
 		"where":      {"where <wildling>", "List bundled trails where a wildling lives", 1, commandWhere},
 		"trails":     {"trails", "List bundled trails and their wildling counts", 0, commandTrails},
 	}
+}
+
+func commandType(cfg *config, args ...string) error {
+	var names []string
+	for name, pokemon := range cfg.pokedex {
+		for _, kind := range pokemon.Types {
+			if kind.Type.Name == args[0] {
+				names = append(names, name)
+				break
+			}
+		}
+	}
+	sort.Strings(names)
+	if len(names) == 0 {
+		_, err := fmt.Fprintf(cfg.out, "No caught %s wildlings.\n", args[0])
+		return err
+	}
+	_, err := fmt.Fprintf(cfg.out, "%s wildlings: %s\n", args[0], strings.Join(names, ", "))
+	return err
 }
 
 func commandTrails(cfg *config, args ...string) error {
