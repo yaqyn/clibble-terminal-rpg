@@ -157,3 +157,16 @@ func TestCollectionCanBeFilteredByTypeOffline(t *testing.T) {
 	output.Reset()
 	if err := commandType(cfg, "water"); err != nil || output.String() != "No caught water wildlings.\n" { t.Fatal(output.String(), err) }
 }
+
+func TestLargestWildlingIsReportedOffline(t *testing.T) {
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{
+		"pidgey": {Name: "pidgey", Weight: 18},
+		"pikachu": {Name: "pikachu", Weight: 60},
+	}}
+	if err := commandLargest(cfg); err != nil { t.Fatal(err) }
+	if output.String() != "Heaviest wildling: pikachu (60 hg)\n" { t.Fatal(output.String()) }
+	output.Reset()
+	cfg.pokedex = map[string]pokeapi.Pokemon{}
+	if err := commandLargest(cfg); err != nil || !strings.Contains(output.String(), "No wildling caught") { t.Fatal(output.String(), err) }
+}

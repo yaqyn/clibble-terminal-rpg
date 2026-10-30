@@ -63,10 +63,26 @@ func getCommands() map[string]cliCommand {
 		"count":      {"count", "Show the number of caught wildling", 0, commandCount},
 		"types":      {"types", "Summarize your collection by wildling type", 0, commandTypes},
 		"type":       {"type <type>", "List caught wildlings with a type", 1, commandType},
+		"largest":    {"largest", "Show your heaviest caught wildling", 0, commandLargest},
 		"supplies":   {"supplies", "Show available catch seeds without spending any", 0, commandSupplies},
 		"where":      {"where <wildling>", "List bundled trails where a wildling lives", 1, commandWhere},
 		"trails":     {"trails", "List bundled trails and their wildling counts", 0, commandTrails},
 	}
+}
+
+func commandLargest(cfg *config, args ...string) error {
+	if len(cfg.pokedex) == 0 {
+		_, err := fmt.Fprintln(cfg.out, "No wildling caught yet. Try catch <wildling>.")
+		return err
+	}
+	var largest pokeapi.Pokemon
+	for _, pokemon := range cfg.pokedex {
+		if pokemon.Weight > largest.Weight || pokemon.Weight == largest.Weight && pokemon.Name < largest.Name {
+			largest = pokemon
+		}
+	}
+	_, err := fmt.Fprintf(cfg.out, "Heaviest wildling: %s (%d hg)\n", largest.Name, largest.Weight)
+	return err
 }
 
 func commandType(cfg *config, args ...string) error {
