@@ -198,3 +198,14 @@ func TestCollectionCanBeSearchedOffline(t *testing.T) {
 		t.Fatal(output.String(), err)
 	}
 }
+
+func TestTallestWildlingIsReportedOffline(t *testing.T) {
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{
+		"pidgey": {Name: "pidgey", Height: 3},
+		"onix":   {Name: "onix", Height: 88},
+	}}
+	if err := commandTallest(cfg); err != nil || output.String() != "Tallest wildling: onix (88 dm)\n" {
+		t.Fatal(output.String(), err)
+	}
+}
