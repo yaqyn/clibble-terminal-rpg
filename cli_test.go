@@ -186,3 +186,15 @@ func TestLargestWildlingIsReportedOffline(t *testing.T) {
 		t.Fatal(output.String(), err)
 	}
 }
+
+func TestCollectionCanBeSearchedOffline(t *testing.T) {
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{"pidgey": {Name: "pidgey"}, "spearow": {Name: "spearow"}, "pikachu": {Name: "pikachu"}}}
+	if err := commandSearch(cfg, "PI"); err != nil || output.String() != "pidgey, pikachu\n" {
+		t.Fatal(output.String(), err)
+	}
+	output.Reset()
+	if err := commandSearch(cfg, "missing"); err != nil || !strings.Contains(output.String(), "No caught wildlings match") {
+		t.Fatal(output.String(), err)
+	}
+}
