@@ -64,10 +64,44 @@ func getCommands() map[string]cliCommand {
 		"types":      {"types", "Summarize your collection by wildling type", 0, commandTypes},
 		"type":       {"type <type>", "List caught wildlings with a type", 1, commandType},
 		"largest":    {"largest", "Show your heaviest caught wildling", 0, commandLargest},
+		"tallest":    {"tallest", "Show your tallest caught wildling", 0, commandTallest},
+		"search":     {"search <text>", "Find caught wildlings by name", 1, commandSearch},
 		"supplies":   {"supplies", "Show available catch seeds without spending any", 0, commandSupplies},
 		"where":      {"where <wildling>", "List bundled trails where a wildling lives", 1, commandWhere},
 		"trails":     {"trails", "List bundled trails and their wildling counts", 0, commandTrails},
 	}
+}
+
+func commandTallest(cfg *config, args ...string) error {
+	if len(cfg.pokedex) == 0 {
+		_, err := fmt.Fprintln(cfg.out, "No wildling caught yet. Try catch <wildling>.")
+		return err
+	}
+	var tallest pokeapi.Pokemon
+	for _, pokemon := range cfg.pokedex {
+		if pokemon.Height > tallest.Height || pokemon.Height == tallest.Height && pokemon.Name < tallest.Name {
+			tallest = pokemon
+		}
+	}
+	_, err := fmt.Fprintf(cfg.out, "Tallest wildling: %s (%d dm)\n", tallest.Name, tallest.Height)
+	return err
+}
+
+func commandSearch(cfg *config, args ...string) error {
+	query := strings.ToLower(args[0])
+	var names []string
+	for name := range cfg.pokedex {
+		if strings.Contains(strings.ToLower(name), query) {
+			names = append(names, name)
+		}
+	}
+	sort.Strings(names)
+	if len(names) == 0 {
+		_, err := fmt.Fprintf(cfg.out, "No caught wildlings match %q.\n", args[0])
+		return err
+	}
+	_, err := fmt.Fprintln(cfg.out, strings.Join(names, ", "))
+	return err
 }
 
 func commandLargest(cfg *config, args ...string) error {
