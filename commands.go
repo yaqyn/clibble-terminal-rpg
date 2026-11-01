@@ -70,7 +70,29 @@ func getCommands() map[string]cliCommand {
 		"where":      {"where <wildling>", "List bundled trails where a wildling lives", 1, commandWhere},
 		"trails":     {"trails", "List bundled trails and their wildling counts", 0, commandTrails},
 		"trail":      {"trail <trail>", "List wildlings on a bundled trail", 1, commandTrail},
+		"progress":   {"progress", "Show progress through the bundled wildlings", 0, commandProgress},
 	}
+}
+
+func commandProgress(cfg *config, args ...string) error {
+	available := map[string]bool{}
+	for _, trail := range trails {
+		for _, name := range trail.creatures {
+			available[name] = true
+		}
+	}
+	caught := 0
+	for name := range cfg.pokedex {
+		if available[name] {
+			caught++
+		}
+	}
+	percent := 0
+	if len(available) > 0 {
+		percent = caught * 100 / len(available)
+	}
+	_, err := fmt.Fprintf(cfg.out, "Bundled wildling progress: %d/%d (%d%%)\n", caught, len(available), percent)
+	return err
 }
 
 func commandTrail(cfg *config, args ...string) error {

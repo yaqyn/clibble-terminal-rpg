@@ -156,6 +156,18 @@ func TestBundledTrailGuideWorksOffline(t *testing.T) {
 	}
 }
 
+func TestBundledWildlingProgressIgnoresLegacyEntries(t *testing.T) {
+	cfg, out, api := testConfig()
+	cfg.pokedex["mosskin"] = pokeapi.Pokemon{Name: "mosskin"}
+	cfg.pokedex["pidgey"] = pokeapi.Pokemon{Name: "pidgey"}
+	if err := commandProgress(cfg); err != nil {
+		t.Fatal(err)
+	}
+	if api.calls != 0 || !strings.Contains(out.String(), "1/10 (10%)") {
+		t.Fatalf("calls=%d output=%q", api.calls, out.String())
+	}
+}
+
 func TestREPLEOFAndInputLimit(t *testing.T) {
 	cfg, _, _ := testConfig()
 	if err := runREPL(cfg, strings.NewReader("")); err != nil {
