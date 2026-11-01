@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
 	"io"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -39,20 +40,24 @@ func (f *fakeAPI) ListLocations(context.Context, *string) (pokeapi.Locations, er
 	f.calls++
 	return f.page, f.err
 }
+
 func (f *fakeAPI) Explore(context.Context, string) (pokeapi.Area, error) {
 	f.calls++
 	return pokeapi.Area{}, f.err
 }
+
 func (f *fakeAPI) GetPokemon(context.Context, string) (pokeapi.Pokemon, error) {
 	f.calls++
 	return f.pokemon, f.err
 }
+
 func testConfig() (*config, *bytes.Buffer, *fakeAPI) {
 	output := new(bytes.Buffer)
 	api := &fakeAPI{pokemon: pokeapi.Pokemon{Name: "pidgey", Height: 3, Weight: 18, BaseExperience: 50}}
 	cfg := &config{commands: getCommands(), client: api, ctx: context.Background(), out: output, pokedex: make(map[string]pokeapi.Pokemon), random: func() float64 { return 0 }}
 	return cfg, output, api
 }
+
 func TestREPLCatchInspectPokedex(t *testing.T) {
 	cfg, out, api := testConfig()
 	err := runREPL(cfg, strings.NewReader("\ninspect pidgey\nCATCH PIDGEY\ninspect pidgey\npokedex\nexit\ncatch pikachu\n"))
@@ -68,6 +73,7 @@ func TestREPLCatchInspectPokedex(t *testing.T) {
 		t.Fatalf("inspect or exit triggered requests: %d", api.calls)
 	}
 }
+
 func TestCatchEscapeAndSaveFailure(t *testing.T) {
 	cfg, out, _ := testConfig()
 	cfg.random = func() float64 { return 0.99 }
@@ -86,6 +92,7 @@ func TestCatchEscapeAndSaveFailure(t *testing.T) {
 		t.Fatal("failed save retained catch")
 	}
 }
+
 func TestREPLInvalidArgumentsAndUnknown(t *testing.T) {
 	cfg, out, api := testConfig()
 	if err := runREPL(cfg, strings.NewReader("what\ncatch\ncatch pidgey extra\nmap extra\ncatch ../secret\nexit\n")); err != nil {
@@ -98,6 +105,7 @@ func TestREPLInvalidArgumentsAndUnknown(t *testing.T) {
 		t.Fatal(out.String())
 	}
 }
+
 func TestPaginationBoundariesAndFailure(t *testing.T) {
 	cfg, out, api := testConfig()
 	commandMapBack(cfg)
@@ -125,6 +133,7 @@ func TestPaginationBoundariesAndFailure(t *testing.T) {
 		t.Fatal("last page requested again")
 	}
 }
+
 func TestProbabilityDecreases(t *testing.T) {
 	if catchProbability(50) <= catchProbability(300) {
 		t.Fatal("stronger wildling should be harder")
@@ -133,6 +142,20 @@ func TestProbabilityDecreases(t *testing.T) {
 		t.Fatal("negative experience invalid")
 	}
 }
+
+func TestBundledTrailGuideWorksOffline(t *testing.T) {
+	cfg, out, api := testConfig()
+	if err := commandTrail(cfg, "Mosslight-Woods"); err != nil {
+		t.Fatal(err)
+	}
+	if api.calls != 0 || !strings.Contains(out.String(), "mosskin, fernlet, puddlehop") {
+		t.Fatalf("calls=%d output=%q", api.calls, out.String())
+	}
+	if err := commandTrail(cfg, "missing"); err == nil {
+		t.Fatal("unknown trail accepted")
+	}
+}
+
 func TestREPLEOFAndInputLimit(t *testing.T) {
 	cfg, _, _ := testConfig()
 	if err := runREPL(cfg, strings.NewReader("")); err != nil {

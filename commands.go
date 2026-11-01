@@ -69,7 +69,18 @@ func getCommands() map[string]cliCommand {
 		"supplies":   {"supplies", "Show available catch seeds without spending any", 0, commandSupplies},
 		"where":      {"where <wildling>", "List bundled trails where a wildling lives", 1, commandWhere},
 		"trails":     {"trails", "List bundled trails and their wildling counts", 0, commandTrails},
+		"trail":      {"trail <trail>", "List wildlings on a bundled trail", 1, commandTrail},
 	}
+}
+
+func commandTrail(cfg *config, args ...string) error {
+	for _, trail := range trails {
+		if strings.EqualFold(trail.name, args[0]) {
+			_, err := fmt.Fprintf(cfg.out, "%s wildlings: %s\n", trail.name, strings.Join(trail.creatures, ", "))
+			return err
+		}
+	}
+	return fmt.Errorf("unknown trail %q; use trails to list bundled trails", args[0])
 }
 
 func commandTallest(cfg *config, args ...string) error {
