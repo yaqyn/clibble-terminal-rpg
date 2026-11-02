@@ -43,6 +43,7 @@ func TestCompanionReadsCollectionAndServesEmbeddedAssets(t *testing.T) {
 		}
 	}
 }
+
 func TestCompanionCollectionSearch(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	savePokedex(path, map[string]pokeapi.Pokemon{
@@ -70,14 +71,18 @@ func TestCompanionCollectionSearch(t *testing.T) {
 		t.Fatal("unknown search accepted", response.Code)
 	}
 }
+
 func TestCompanionCollectionLimit(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	savePokedex(path, map[string]pokeapi.Pokemon{"alpha": {Name: "alpha"}, "beta": {Name: "beta"}})
 	handler := companionHandler(path, "127.0.0.1:8787")
 	response := httptest.NewRecorder()
 	handler.ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?limit=1", nil))
-	var body struct{ Pokemon []pokeapi.Pokemon }
-	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil || response.Code != 200 || len(body.Pokemon) != 1 || body.Pokemon[0].Name != "alpha" {
+	var body struct {
+		Pokemon []pokeapi.Pokemon
+		Total   int
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil || response.Code != 200 || len(body.Pokemon) != 1 || body.Pokemon[0].Name != "alpha" || body.Total != 2 || response.Header().Get("X-Total-Count") != "2" {
 		t.Fatalf("limited response: %d %s", response.Code, response.Body.String())
 	}
 	for _, value := range []string{"0", "501", "many"} {
@@ -88,6 +93,7 @@ func TestCompanionCollectionLimit(t *testing.T) {
 		}
 	}
 }
+
 func TestCompanionCollectionSortsDescendingBeforeLimiting(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	savePokedex(path, map[string]pokeapi.Pokemon{"alpha": {Name: "alpha"}, "beta": {Name: "beta"}})
@@ -102,6 +108,7 @@ func TestCompanionCollectionSortsDescendingBeforeLimiting(t *testing.T) {
 		t.Fatalf("accepted invalid sort: %d", response.Code)
 	}
 }
+
 func TestCompanionCollectionOffset(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	savePokedex(path, map[string]pokeapi.Pokemon{"alpha": {Name: "alpha"}, "beta": {Name: "beta"}})
@@ -118,6 +125,7 @@ func TestCompanionCollectionOffset(t *testing.T) {
 		}
 	}
 }
+
 func TestCompanionRejectsForeignHostsOriginsAndWrites(t *testing.T) {
 	handler := companionHandler(filepath.Join(t.TempDir(), "collection.json"), "127.0.0.1:8787")
 	for _, tc := range []struct {
@@ -140,6 +148,7 @@ func TestCompanionRejectsForeignHostsOriginsAndWrites(t *testing.T) {
 		}
 	}
 }
+
 func TestCompanionCollectionSearchIncludesTypes(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	var pidgey pokeapi.Pokemon
@@ -153,6 +162,7 @@ func TestCompanionCollectionSearchIncludesTypes(t *testing.T) {
 		t.Fatal(response.Code, response.Body.String())
 	}
 }
+
 func TestCompanionCollectionFiltersByExactType(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	var flying, electric pokeapi.Pokemon
@@ -169,6 +179,7 @@ func TestCompanionCollectionFiltersByExactType(t *testing.T) {
 		t.Fatal(response.Code, response.Body.String())
 	}
 }
+
 func TestCompanionCollectionFiltersByExactName(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	savePokedex(path, map[string]pokeapi.Pokemon{"pidgey": {Name: "pidgey"}, "pidgeotto": {Name: "pidgeotto"}})
@@ -178,6 +189,7 @@ func TestCompanionCollectionFiltersByExactName(t *testing.T) {
 		t.Fatal(response.Code, response.Body.String())
 	}
 }
+
 func TestCompanionCollectionSearchCombinesWordsAcrossNameAndType(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	var pidgey, pikachu pokeapi.Pokemon
@@ -194,9 +206,10 @@ func TestCompanionCollectionSearchCombinesWordsAcrossNameAndType(t *testing.T) {
 		t.Fatal(response.Code, response.Body.String())
 	}
 }
+
 func TestCompanionReportsCorruptionWithoutLeakingOrChangingSave(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "private-collection.json")
-	os.WriteFile(path, []byte("{broken"), 0600)
+	os.WriteFile(path, []byte("{broken"), 0o600)
 	response := httptest.NewRecorder()
 	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection", nil))
 	if response.Code != 500 || strings.Contains(response.Body.String(), path) {

@@ -129,6 +129,7 @@ func companionHandler(path, authority string) http.Handler {
 					items[left], items[right] = items[right], items[left]
 				}
 			}
+			total := len(items)
 			if offset >= len(items) {
 				items = items[:0]
 			} else {
@@ -138,13 +139,15 @@ func companionHandler(path, authority string) http.Handler {
 				items = items[:limit]
 			}
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+			w.Header().Set("X-Total-Count", strconv.Itoa(total))
 			if r.Method == http.MethodHead {
 				return
 			}
 			_ = json.NewEncoder(w).Encode(struct {
 				Name    string            `json:"name"`
 				Pokemon []pokeapi.Pokemon `json:"pokemon"`
-			}{brand.Get().Name, items})
+				Total   int               `json:"total"`
+			}{brand.Get().Name, items, total})
 			return
 		}
 		if r.URL.Path == "/" { // FileServer redirects index.html to the directory; serve it explicitly.
@@ -163,6 +166,7 @@ func companionHandler(path, authority string) http.Handler {
 		static.ServeHTTP(w, r)
 	})
 }
+
 func serveCompanion(ctx context.Context, path string, port int, out io.Writer) error {
 	if port < 0 || port > 65535 {
 		return fmt.Errorf("-port must be between 0 and 65535")
