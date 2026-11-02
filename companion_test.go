@@ -109,6 +109,19 @@ func TestCompanionCollectionSortsDescendingBeforeLimiting(t *testing.T) {
 	}
 }
 
+func TestCompanionCollectionSortsByHeight(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "collection.json")
+	savePokedex(path, map[string]pokeapi.Pokemon{
+		"alpha": {Name: "alpha", Height: 2},
+		"beta":  {Name: "beta", Height: 8},
+	})
+	response := httptest.NewRecorder()
+	companionHandler(path, "127.0.0.1:8787").ServeHTTP(response, httptest.NewRequest("GET", "http://127.0.0.1:8787/api/collection?sort=height-desc&limit=1", nil))
+	if response.Code != http.StatusOK || !strings.Contains(response.Body.String(), "beta") || strings.Contains(response.Body.String(), "alpha") {
+		t.Fatalf("height response: %d %s", response.Code, response.Body.String())
+	}
+}
+
 func TestCompanionCollectionOffset(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "collection.json")
 	savePokedex(path, map[string]pokeapi.Pokemon{"alpha": {Name: "alpha"}, "beta": {Name: "beta"}})

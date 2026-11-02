@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -93,8 +94,8 @@ func companionHandler(path, authority string) http.Handler {
 				}
 			}
 			sortOrder := values.Get("sort")
-			if sortOrder != "" && sortOrder != "name" && sortOrder != "name-desc" {
-				http.Error(w, "Sort must be name or name-desc.", http.StatusBadRequest)
+			if sortOrder != "" && sortOrder != "name" && sortOrder != "name-desc" && sortOrder != "height-desc" {
+				http.Error(w, "Sort must be name, name-desc, or height-desc.", http.StatusBadRequest)
 				return
 			}
 			pokemon, err := loadPokedex(path)
@@ -128,6 +129,11 @@ func companionHandler(path, authority string) http.Handler {
 				for left, right := 0, len(items)-1; left < right; left, right = left+1, right-1 {
 					items[left], items[right] = items[right], items[left]
 				}
+			}
+			if sortOrder == "height-desc" {
+				sort.SliceStable(items, func(left, right int) bool {
+					return items[left].Height > items[right].Height
+				})
 			}
 			total := len(items)
 			if offset >= len(items) {
