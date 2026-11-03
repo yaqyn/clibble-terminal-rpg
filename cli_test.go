@@ -226,3 +226,18 @@ func TestMissingWildlingsAreReportedByTrail(t *testing.T) {
 		t.Fatal("unknown trail was accepted")
 	}
 }
+
+func TestStrongestWildlingUsesTotalBaseStats(t *testing.T) {
+	var pidgey, pikachu pokeapi.Pokemon
+	if err := json.Unmarshal([]byte(`{"name":"pidgey","stats":[{"base_stat":45},{"base_stat":40}]}`), &pidgey); err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal([]byte(`{"name":"pikachu","stats":[{"base_stat":55},{"base_stat":90}]}`), &pikachu); err != nil {
+		t.Fatal(err)
+	}
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{"pidgey": pidgey, "pikachu": pikachu}}
+	if err := commandStrongest(cfg); err != nil || output.String() != "Strongest wildling: pikachu (145 total base stats)\n" {
+		t.Fatal(output.String(), err)
+	}
+}

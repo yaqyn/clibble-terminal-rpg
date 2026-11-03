@@ -72,7 +72,28 @@ func getCommands() map[string]cliCommand {
 		"trail":      {"trail <trail>", "List wildlings on a bundled trail", 1, commandTrail},
 		"progress":   {"progress", "Show progress through the bundled wildlings", 0, commandProgress},
 		"missing":    {"missing <trail>", "List uncaught wildlings on a bundled trail", 1, commandMissing},
+		"strongest":  {"strongest", "Show the caught wildling with the highest total stats", 0, commandStrongest},
 	}
+}
+
+func commandStrongest(cfg *config, args ...string) error {
+	if len(cfg.pokedex) == 0 {
+		_, err := fmt.Fprintln(cfg.out, "No wildling caught yet. Try catch <wildling>.")
+		return err
+	}
+	var strongest pokeapi.Pokemon
+	best := -1
+	for _, pokemon := range cfg.pokedex {
+		total := 0
+		for _, stat := range pokemon.Stats {
+			total += stat.BaseStat
+		}
+		if total > best || total == best && pokemon.Name < strongest.Name {
+			strongest, best = pokemon, total
+		}
+	}
+	_, err := fmt.Fprintf(cfg.out, "Strongest wildling: %s (%d total base stats)\n", strongest.Name, best)
+	return err
 }
 
 func commandMissing(cfg *config, args ...string) error {
