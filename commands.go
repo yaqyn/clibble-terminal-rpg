@@ -71,7 +71,29 @@ func getCommands() map[string]cliCommand {
 		"trails":     {"trails", "List bundled trails and their wildling counts", 0, commandTrails},
 		"trail":      {"trail <trail>", "List wildlings on a bundled trail", 1, commandTrail},
 		"progress":   {"progress", "Show progress through the bundled wildlings", 0, commandProgress},
+		"missing":    {"missing <trail>", "List uncaught wildlings on a bundled trail", 1, commandMissing},
 	}
+}
+
+func commandMissing(cfg *config, args ...string) error {
+	for _, trail := range trails {
+		if !strings.EqualFold(trail.name, args[0]) {
+			continue
+		}
+		missing := make([]string, 0, len(trail.creatures))
+		for _, name := range trail.creatures {
+			if _, caught := cfg.pokedex[name]; !caught {
+				missing = append(missing, name)
+			}
+		}
+		if len(missing) == 0 {
+			_, err := fmt.Fprintf(cfg.out, "%s complete: every wildling is in your collection.\n", trail.name)
+			return err
+		}
+		_, err := fmt.Fprintf(cfg.out, "Missing from %s: %s\n", trail.name, strings.Join(missing, ", "))
+		return err
+	}
+	return fmt.Errorf("unknown trail %q; use trails to list bundled trails", args[0])
 }
 
 func commandProgress(cfg *config, args ...string) error {

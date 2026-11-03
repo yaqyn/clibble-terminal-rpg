@@ -209,3 +209,20 @@ func TestTallestWildlingIsReportedOffline(t *testing.T) {
 		t.Fatal(output.String(), err)
 	}
 }
+
+func TestMissingWildlingsAreReportedByTrail(t *testing.T) {
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{"mosskin": {Name: "mosskin"}}}
+	if err := commandMissing(cfg, "Mosslight-Woods"); err != nil || output.String() != "Missing from mosslight-woods: fernlet, puddlehop\n" {
+		t.Fatal(output.String(), err)
+	}
+	output.Reset()
+	cfg.pokedex["fernlet"] = pokeapi.Pokemon{Name: "fernlet"}
+	cfg.pokedex["puddlehop"] = pokeapi.Pokemon{Name: "puddlehop"}
+	if err := commandMissing(cfg, "mosslight-woods"); err != nil || !strings.Contains(output.String(), "complete") {
+		t.Fatal(output.String(), err)
+	}
+	if err := commandMissing(cfg, "missing"); err == nil {
+		t.Fatal("unknown trail was accepted")
+	}
+}
