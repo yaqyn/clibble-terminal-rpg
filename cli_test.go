@@ -241,3 +241,14 @@ func TestStrongestWildlingUsesTotalBaseStats(t *testing.T) {
 		t.Fatal(output.String(), err)
 	}
 }
+
+func TestTrailCoverageReportsCaughtCounts(t *testing.T) {
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{"mosskin": {Name: "mosskin"}}}
+	if err := commandCoverage(cfg); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(output.String(), "mosslight-woods: 1/3 caught") {
+		t.Fatal(output.String())
+	}
+}

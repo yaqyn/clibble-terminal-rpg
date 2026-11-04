@@ -73,7 +73,23 @@ func getCommands() map[string]cliCommand {
 		"progress":   {"progress", "Show progress through the bundled wildlings", 0, commandProgress},
 		"missing":    {"missing <trail>", "List uncaught wildlings on a bundled trail", 1, commandMissing},
 		"strongest":  {"strongest", "Show the caught wildling with the highest total stats", 0, commandStrongest},
+		"coverage":   {"coverage", "Show collection progress for each bundled trail", 0, commandCoverage},
 	}
+}
+
+func commandCoverage(cfg *config, args ...string) error {
+	for _, trail := range trails {
+		caught := 0
+		for _, name := range trail.creatures {
+			if _, ok := cfg.pokedex[name]; ok {
+				caught++
+			}
+		}
+		if _, err := fmt.Fprintf(cfg.out, "%s: %d/%d caught\n", trail.name, caught, len(trail.creatures)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func commandStrongest(cfg *config, args ...string) error {
