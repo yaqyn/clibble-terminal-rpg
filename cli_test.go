@@ -252,3 +252,13 @@ func TestTrailCoverageReportsCaughtCounts(t *testing.T) {
 		t.Fatal(output.String())
 	}
 }
+
+func TestSurpriseChoosesFromTheCaughtCollection(t *testing.T) {
+	var output bytes.Buffer
+	cfg := &config{out: &output, random: func() float64 { return 0.75 }, pokedex: map[string]pokeapi.Pokemon{
+		"fernlet": {Name: "fernlet"}, "mosskin": {Name: "mosskin"},
+	}}
+	if err := commandSurprise(cfg); err != nil || output.String() != "Adventure companion: mosskin\n" {
+		t.Fatal(output.String(), err)
+	}
+}

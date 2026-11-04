@@ -74,7 +74,22 @@ func getCommands() map[string]cliCommand {
 		"missing":    {"missing <trail>", "List uncaught wildlings on a bundled trail", 1, commandMissing},
 		"strongest":  {"strongest", "Show the caught wildling with the highest total stats", 0, commandStrongest},
 		"coverage":   {"coverage", "Show collection progress for each bundled trail", 0, commandCoverage},
+		"surprise":   {"surprise", "Choose a caught wildling for your next adventure", 0, commandSurprise},
 	}
+}
+
+func commandSurprise(cfg *config, args ...string) error {
+	names := sortedKeys(cfg.pokedex)
+	if len(names) == 0 {
+		_, err := fmt.Fprintln(cfg.out, "No wildling caught yet. Try catch <wildling>.")
+		return err
+	}
+	choice := 0
+	if cfg.random != nil {
+		choice = min(int(cfg.random()*float64(len(names))), len(names)-1)
+	}
+	_, err := fmt.Fprintf(cfg.out, "Adventure companion: %s\n", names[choice])
+	return err
 }
 
 func commandCoverage(cfg *config, args ...string) error {
