@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"strings"
 	"testing"
+
+	"github.com/yaqyn/clibble-terminal-rpg/internal/pokeapi"
 )
 
 func TestTrailsListsBundledGuideWithoutAnAPI(t *testing.T) {
@@ -32,5 +34,16 @@ func TestWhereListsBundledHabitatsWithoutAnAPI(t *testing.T) {
 	}
 	if output.Len() != 0 {
 		t.Fatal("unknown wildling produced misleading locations")
+	}
+}
+
+func TestNextTrailRecommendsTheLargestCollectionGap(t *testing.T) {
+	var output bytes.Buffer
+	cfg := &config{out: &output, pokedex: map[string]pokeapi.Pokemon{}}
+	if err := commandNextTrail(cfg); err != nil {
+		t.Fatal(err)
+	}
+	if output.String() != "Recommended trail: bramble-hollow (3 uncaught wildlings)\n" {
+		t.Fatal(output.String())
 	}
 }
