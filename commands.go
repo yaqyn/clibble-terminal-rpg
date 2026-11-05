@@ -76,7 +76,25 @@ func getCommands() map[string]cliCommand {
 		"coverage":   {"coverage", "Show collection progress for each bundled trail", 0, commandCoverage},
 		"surprise":   {"surprise", "Choose a caught wildling for your next adventure", 0, commandSurprise},
 		"nexttrail":  {"nexttrail", "Recommend the bundled trail with the most uncaught wildlings", 0, commandNextTrail},
+		"habitats":   {"habitats", "List wildlings found on more than one bundled trail", 0, commandHabitats},
 	}
+}
+
+func commandHabitats(cfg *config, args ...string) error {
+	habitats := map[string][]string{}
+	for _, trail := range trails {
+		for _, name := range trail.creatures {
+			habitats[name] = append(habitats[name], trail.name)
+		}
+	}
+	for _, name := range sortedKeys(habitats) {
+		if len(habitats[name]) > 1 {
+			if _, err := fmt.Fprintf(cfg.out, "%s: %s\n", name, strings.Join(habitats[name], ", ")); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func commandNextTrail(cfg *config, args ...string) error {

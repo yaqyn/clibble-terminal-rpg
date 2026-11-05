@@ -47,3 +47,16 @@ func TestNextTrailRecommendsTheLargestCollectionGap(t *testing.T) {
 		t.Fatal(output.String())
 	}
 }
+
+func TestHabitatsListsOnlyWildlingsSharedByTrails(t *testing.T) {
+	var output bytes.Buffer
+	if err := commandHabitats(&config{out: &output}); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(output.String(), "mosskin: mosslight-woods, bramble-hollow\n") {
+		t.Fatal(output.String())
+	}
+	if strings.Contains(output.String(), "bramblebun:") {
+		t.Fatal("single-trail wildling was reported")
+	}
+}
