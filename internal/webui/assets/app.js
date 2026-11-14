@@ -202,6 +202,12 @@ ui.search.addEventListener("input", () => {
   state.limit = 100;
   renderList();
 });
+ui.search.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || ui.search.value.length === 0) return;
+  event.preventDefault();
+  ui.search.value = "";
+  renderList();
+});
 ui.more.addEventListener("click", () => {
   state.limit += 100;
   renderList();

@@ -89,6 +89,28 @@ test("empty state provides a real next action", async () => {
   assert.equal(app.document.querySelector("#search").disabled, true);
   app.dom.window.close();
 });
+test("escape clears an active collection search", async () => {
+  const app = await setup([
+    creature("pidgey", "flying"),
+    creature("pikachu", "electric"),
+  ]);
+  const search = app.document.querySelector("#search");
+  search.focus();
+  search.value = "missing";
+  search.dispatchEvent(new app.dom.window.Event("input"));
+  assert.equal(app.document.querySelectorAll(".creature").length, 0);
+  search.dispatchEvent(
+    new app.dom.window.KeyboardEvent("keydown", {
+      key: "Escape",
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+  assert.equal(search.value, "");
+  assert.equal(app.document.activeElement, search);
+  assert.equal(app.document.querySelectorAll(".creature").length, 2);
+  app.dom.window.close();
+});
 test("refresh failures preserve readable records and enable retry", async () => {
   const app = await setup([creature("pidgey", "flying")]);
   app.fail();
