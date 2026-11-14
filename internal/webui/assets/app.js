@@ -27,11 +27,17 @@ const node = (tag, className, text) => {
 const types = (pokemon) =>
   (pokemon.types || []).map((entry) => entry.type.name);
 function visiblewildling() {
-  const query = ui.search.value.trim().toLowerCase();
-  return state.pokemon.filter(
-    (pokemon) =>
-      pokemon.name.includes(query) ||
-      types(pokemon).some((type) => type.includes(query)),
+  const terms = ui.search.value
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+  return state.pokemon.filter((pokemon) =>
+    terms.every(
+      (term) =>
+        pokemon.name.includes(term) ||
+        types(pokemon).some((type) => type.includes(term)),
+    ),
   );
 }
 function select(pokemon) {
