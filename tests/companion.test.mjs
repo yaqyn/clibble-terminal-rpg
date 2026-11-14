@@ -60,6 +60,13 @@ test("search by type, choose a record, clear, and recover from no results", asyn
   search.dispatchEvent(new app.dom.window.Event("input"));
   assert.equal(doc.querySelectorAll(".creature").length, 1);
   assert.equal(doc.querySelector("#count").textContent, "1 of 2");
+  search.value = "pidge flying";
+  search.dispatchEvent(new app.dom.window.Event("input"));
+  assert.equal(doc.querySelectorAll(".creature").length, 1);
+  assert.equal(doc.querySelector("#record-title").textContent, "pidgey");
+  search.value = "pidge electric";
+  search.dispatchEvent(new app.dom.window.Event("input"));
+  assert.equal(doc.querySelectorAll(".creature").length, 0);
   search.value = "missing";
   search.dispatchEvent(new app.dom.window.Event("input"));
   assert.equal(
